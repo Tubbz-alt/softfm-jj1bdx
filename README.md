@@ -1,5 +1,12 @@
 # SoftFM - Software decoder for FM broadcast radio with RTL-SDR
 
+## Modification of jj1bdx fork
+
+* Remove ALSA dependency to make this software run on macOS
+* Fix other glitches on macOS
+
+## Original README begins here
+
 SoftFM is a software-defined radio receiver for FM broadcast radio.
 It is written in C++ and uses RTL-SDR to interface with RTL2832-based
 hardware.
@@ -13,7 +20,7 @@ The purposes of SoftFM are
 
 Having said that, SoftFM actually produces pretty good stereo sound
 when receiving a strong radio station.  Weak stations are noisy,
-but SoftFM gets much better results than rtl_fm (bundled with RTL-SDR)
+but SoftFM gets much better results than rtl\_fm (bundled with RTL-SDR)
 and the few GNURadio-based FM receivers I have seen.
 
 SoftFM provides:
