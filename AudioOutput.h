@@ -112,30 +112,4 @@ private:
     std::vector<std::uint8_t> m_bytebuf;
 };
 
-
-/** Write audio data to ALSA device. */
-class AlsaAudioOutput : public AudioOutput
-{
-public:
-
-    /**
-     * Construct ALSA output stream.
-     *
-     * dename       :: ALSA PCM device
-     * samplerate   :: audio sample rate in Hz
-     * stereo       :: true if the output stream contains stereo data
-     */
-    AlsaAudioOutput(const std::string& devname,
-                    unsigned int samplerate,
-                    bool stereo);
-
-    ~AlsaAudioOutput();
-    bool write(const SampleVector& samples);
-
-private:
-    unsigned int         m_nchannels;
-    struct _snd_pcm *    m_pcm;
-    std::vector<std::uint8_t> m_bytebuf;
-};
-
 #endif

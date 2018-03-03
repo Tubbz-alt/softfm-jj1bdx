@@ -5,7 +5,6 @@ project(SoftFM)
 
 find_package(Threads)
 find_package(PkgConfig)
-find_package(ALSA REQUIRED)
 
 # Find RTL-SDR library (for linking).
 pkg_check_modules(PKG_RTLSDR librtlsdr)
@@ -46,13 +45,11 @@ add_executable(softfm
 
 include_directories(
     ${RTLSDR_INCLUDE_DIRS}
-    ${ALSA_INCLUDE_DIRS}
     ${EXTRA_INCLUDES} )
 
 target_link_libraries(softfm
     ${CMAKE_THREAD_LIBS_INIT}
     ${RTLSDR_LIBRARIES}
-    ${ALSA_LIBRARIES}
     ${EXTRA_LIBS} )
 
 install(TARGETS softfm DESTINATION bin)

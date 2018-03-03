@@ -29,7 +29,10 @@
 #include <cerrno>
 #include <algorithm>
 
-#include <alsa/asoundlib.h>
+extern "C"
+{
+    #include <assert.h>
+}
 
 #include "SoftFM.h"
 #include "AudioOutput.h"
@@ -260,89 +263,6 @@ void WavAudioOutput::set_value(uint8_t * ptr, T value)
         ptr[i] = value & 0xff;
         value >>= 8;
     }
-}
-
-
-/* ****************  class AlsaAudioOutput  **************** */
-
-// Construct ALSA output stream.
-AlsaAudioOutput::AlsaAudioOutput(const std::string& devname,
-                                 unsigned int samplerate,
-                                 bool stereo)
-{
-    m_pcm = NULL;
-    m_nchannels = stereo ? 2 : 1;
-
-    int r = snd_pcm_open(&m_pcm, devname.c_str(),
-                         SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
-
-    if (r < 0) {
-        m_error = "can not open PCM device '" + devname + "' (" +
-                  strerror(-r) + ")";
-        m_zombie = true;
-        return;
-    }
-
-    snd_pcm_nonblock(m_pcm, 0);
-
-    r = snd_pcm_set_params(m_pcm,
-                           SND_PCM_FORMAT_S16_LE,
-                           SND_PCM_ACCESS_RW_INTERLEAVED,
-                           m_nchannels,
-                           samplerate,
-                           1,               // allow soft resampling
-                           500000);         // latency in us
-
-    if (r < 0) {
-        m_error = "can not set PCM parameters (";
-        m_error += strerror(-r);
-        m_error += ")";
-        m_zombie = true;
-    }
-}
-
-
-// Destructor.
-AlsaAudioOutput::~AlsaAudioOutput()
-{
-    // Close device.
-    if (m_pcm != NULL) {
-        snd_pcm_close(m_pcm);
-    }
-}
-
-
-// Write audio data.
-bool AlsaAudioOutput::write(const SampleVector& samples)
-{
-    if (m_zombie)
-        return false;
-
-    // Convert samples to bytes.
-    samplesToInt16(samples, m_bytebuf);
-
-    // Write data.
-    unsigned int p = 0;
-    unsigned int n = samples.size() / m_nchannels;
-    unsigned int framesize = 2 * m_nchannels;
-    while (p < n) {
-
-        int k = snd_pcm_writei(m_pcm,
-                               m_bytebuf.data() + p * framesize, n - p);
-        if (k < 0) {
-            m_error = "write failed (";
-            m_error += strerror(errno);
-            m_error += ")";
-            // After an underrun, ALSA keeps returning error codes until we
-            // explicitly fix the stream.
-            snd_pcm_recover(m_pcm, k, 0);
-            return false;
-        } else {
-            p += k;
-        }
-    }
-
-    return true;
 }
 
 /* end */

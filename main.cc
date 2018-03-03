@@ -225,8 +225,8 @@ void usage()
             "  -M            Disable stereo decoding\n"
             "  -R filename   Write audio data as raw S16_LE samples\n"
             "                use filename '-' to write to stdout\n"
+            "                (default output mode)\n"
             "  -W filename   Write audio data to .WAV file\n"
-            "  -P [device]   Play audio via ALSA device (default 'default')\n"
             "  -T filename   Write pulse-per-second timestamps\n"
             "                use filename '-' to write to stdout\n"
             "  -b seconds    Set audio buffer size in seconds\n"
@@ -298,8 +298,8 @@ int main(int argc, char **argv)
     double  ifrate  = 1.0e6;
     int     pcmrate = 48000;
     bool    stereo  = true;
-    enum OutputMode { MODE_RAW, MODE_WAV, MODE_ALSA };
-    OutputMode outmode = MODE_ALSA;
+    enum OutputMode { MODE_RAW, MODE_WAV };
+    OutputMode outmode = MODE_RAW;
     string  filename;
     string  alsadev("default");
     string  ppsfilename;
@@ -379,11 +379,6 @@ int main(int argc, char **argv)
             case 'W':
                 outmode = MODE_WAV;
                 filename = optarg;
-                break;
-            case 'P':
-                outmode = MODE_ALSA;
-                if (optarg != NULL)
-                    alsadev = optarg;
                 break;
             case 'T':
                 ppsfilename = optarg;
@@ -501,7 +496,8 @@ int main(int argc, char **argv)
     fprintf(stderr, "baseband downsampling factor %u\n", downsample);
 
     // Prevent aliasing at very low output sample rates.
-    double bandwidth_pcm = min(FmDecoder::default_bandwidth_pcm,
+    double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
+    double bandwidth_pcm = min(default_bandwidth_pcm,
                                0.45 * pcmrate);
     fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
     fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
@@ -520,7 +516,7 @@ int main(int argc, char **argv)
     // Calculate number of samples in audio buffer.
     unsigned int outputbuf_samples = 0;
     if (bufsecs < 0 &&
-        (outmode == MODE_ALSA || (outmode == MODE_RAW && filename == "-"))) {
+        (outmode == MODE_RAW && filename == "-")) {
         // Set default buffer to 1 second for interactive output streams.
         outputbuf_samples = pcmrate;
     } else if (bufsecs > 0) {
@@ -563,11 +559,6 @@ int main(int argc, char **argv)
             fprintf(stderr, "writing audio samples to '%s'\n",
                     filename.c_str());
             audio_output.reset(new WavAudioOutput(filename, pcmrate, stereo));
-            break;
-        case MODE_ALSA:
-            fprintf(stderr, "playing audio to ALSA device '%s'\n",
-                    alsadev.c_str());
-            audio_output.reset(new AlsaAudioOutput(alsadev, pcmrate, stereo));
             break;
     }
 
