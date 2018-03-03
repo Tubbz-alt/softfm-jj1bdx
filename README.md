@@ -5,6 +5,11 @@
 * Remove ALSA dependency to make this software run on macOS
 * Fix other glitches on macOS
 
+### macOS usage example
+
+    ./softfm -f 88100000 -g 20.7 -b 0.1 -R - | \
+        play -t raw -esigned-integer -b16 -r 48000 -c 2 -
+
 ## Original README begins here
 
 SoftFM is a software-defined radio receiver for FM broadcast radio.
