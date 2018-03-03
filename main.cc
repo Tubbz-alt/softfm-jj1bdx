@@ -301,7 +301,6 @@ int main(int argc, char **argv)
     enum OutputMode { MODE_RAW, MODE_WAV };
     OutputMode outmode = MODE_RAW;
     string  filename;
-    string  alsadev("default");
     string  ppsfilename;
     FILE *  ppsfile = NULL;
     double  bufsecs = -1;
