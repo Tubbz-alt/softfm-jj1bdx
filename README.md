@@ -5,11 +5,12 @@
 * Remove ALSA dependency to make this software run on macOS
 * Fix other glitches on macOS
 * Merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
+* Add quiet mode
 
 ### macOS usage example
 
-    ./softfm -f 88100000 -g 20.7 -b 0.1 -R - | \
-        play -t raw -esigned-integer -b16 -r 48000 -c 2 -
+    ./softfm -f 88100000 -g 8.7 -b 1.0 -q -R - | \
+        play -t raw -esigned-integer -b16 -r 48000 -c 2 -q -
 
 ## Original README begins here
 
