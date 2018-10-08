@@ -30,7 +30,7 @@ inline float fastatan2(float y, float x)
 {
     const float n1 = 0.97239411f;
     const float n2 = -0.19194795f;
-    const float pi = (float)(std::acos(-1.0));
+    const float pi = (float)(M_PI);
     const float pi_2 = pi/2.0f;
     float result = 0.0f;
     if (x != 0.0f)
