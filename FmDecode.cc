@@ -326,9 +326,8 @@ void FmDecoder::process(const IQSampleVector& samples_in,
     // Extract mono audio signal.
     m_resample_mono.process(m_buf_baseband, m_buf_mono);
 
-    // DC blocking and de-emphasis.
+    // DC blocking
     m_dcblock_mono.process_inplace(m_buf_mono);
-    m_deemph_mono.process_inplace(m_buf_mono);
 
     if (m_stereo_enabled) {
 
@@ -345,17 +344,20 @@ void FmDecoder::process(const IQSampleVector& samples_in,
         // kept in sync.
         m_resample_stereo.process(m_buf_rawstereo, m_buf_stereo);
 
-        // DC blocking and de-emphasis.
+        // DC blocking
         m_dcblock_stereo.process_inplace(m_buf_stereo);
-        m_deemph_stereo.process_inplace(m_buf_stereo);
 
         if (m_stereo_detected) {
 
-            // Extract left/right channels from mono/stereo signals.
+            // Extract left/right channels from (L+R) / (L-R) signals.
             stereo_to_left_right(m_buf_mono, m_buf_stereo, audio);
+            // Stereo deemphasis to L and R 
+            m_deemph_stereo.process_inplace(audio);
 
         } else {
 
+            // Mono deemphasis
+            m_deemph_mono.process_inplace(m_buf_mono);
             // Duplicate mono signal in left/right channels.
             mono_to_left_right(m_buf_mono, audio);
 
@@ -363,6 +365,8 @@ void FmDecoder::process(const IQSampleVector& samples_in,
 
     } else {
 
+        // Mono deemphasis
+        m_deemph_mono.process_inplace(m_buf_mono);
         // Just return mono channel.
         audio = move(m_buf_mono);
 
@@ -402,7 +406,7 @@ void FmDecoder::mono_to_left_right(const SampleVector& samples_mono,
 }
 
 
-// Extract left/right channels from mono/stereo signals.
+// Extract left/right channels from (L+R) / (L-R) signals.
 void FmDecoder::stereo_to_left_right(const SampleVector& samples_mono,
                                      const SampleVector& samples_stereo,
                                      SampleVector& audio)
