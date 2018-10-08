@@ -219,7 +219,7 @@ void usage()
             "  -d devidx     RTL-SDR device index, 'list' to show device list (default 0)\n"
             "  -g gain       Set LNA gain in dB, or 'auto' (default auto)\n"
             "  -a            Enable RTL AGC mode (default disabled)\n"
-            "  -s ifrate     IF sample rate in Hz (default 1000000)\n"
+            "  -s ifrate     IF sample rate in Hz (default 1200000)\n"
             "                (valid ranges: [225001, 300000], [900001, 3200000]))\n"
             "  -r pcmrate    Audio sample rate in Hz (default 48000 Hz)\n"
             "  -M            Disable stereo decoding\n"
@@ -296,7 +296,7 @@ int main(int argc, char **argv)
     int     devidx  = 0;
     int     lnagain = INT_MIN;
     bool    agcmode = false;
-    double  ifrate  = 1.0e6;
+    double  ifrate  = 1.2e6;
     int     pcmrate = 48000;
     bool    stereo  = true;
     enum OutputMode { MODE_RAW, MODE_WAV };
