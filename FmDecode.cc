@@ -7,33 +7,6 @@
 
 using namespace std;
 
-
-/** Fast approximation of atan function. */
-static inline Sample fast_atan(Sample x)
-{
-    // http://stackoverflow.com/questions/7378187/approximating-inverse-trigonometric-funcions
-
-    Sample y = 1;
-    Sample p = 0;
-
-    if (x < 0) {
-        x = -x;
-        y = -1;
-    }
-
-    if (x > 1) {
-        p = y;
-        y = -y;
-        x = 1 / x;
-    }
-
-    const Sample b = 0.596227;
-    y *= (b*x + x*x) / (1 + 2*b*x + x*x);
-
-    return (y + p) * Sample(M_PI_2);
-}
-
-
 /** Compute RMS level over a small prefix of the specified sample vector. */
 static IQSample::value_type rms_level_approx(const IQSampleVector& samples)
 {
@@ -291,7 +264,7 @@ FmDecoder::FmDecoder(double sample_rate_if,
     // Construct PilotPhaseLock
     , m_pilotpll(pilot_freq / m_sample_rate_baseband,       // freq
                  50 / m_sample_rate_baseband,               // bandwidth
-                 0.04)                                      // minsignal
+                 0.01)                                      // minsignal (was 0.04)
 
     // Construct DownsampleFilter for mono channel
     , m_resample_mono(
@@ -402,14 +375,14 @@ void FmDecoder::demod_stereo(const SampleVector& samples_baseband,
                              SampleVector& samples_rawstereo)
 {
     // Just multiply the baseband signal with the double-frequency pilot.
-    // And multiply by two to get the full amplitude.
+    // And multiply by 1.17 to get the full amplitude.
     // That's all.
 
     unsigned int n = samples_baseband.size();
     assert(n == samples_rawstereo.size());
 
     for (unsigned int i = 0; i < n; i++) {
-        samples_rawstereo[i] *= 2 * samples_baseband[i];
+        samples_rawstereo[i] *= 1.17 * samples_baseband[i];
     }
 }
 
