@@ -23,17 +23,15 @@
 #include <cstdint>
 
 // Fast arctan2
-// See https://www.dsprelated.com/showarticle/1052.php
-// for the algorithm
+// For the algorithms, see:
+// https://www.dsprelated.com/showarticle/1052.php
 
 inline float fastatan2(float y, float x)
 {
+    const float n1 = 0.97239411f;
+    const float n2 = -0.19194795f;
     const float pi = (float)(std::acos(-1.0));
     const float pi_2 = pi/2.0f;
-    const float a1 = -0.060317f;
-    const float a2 = -0.198146f;
-    const float a3 = 1.044261f;
-    const float a4 = -0.002178f;
     float result = 0.0f;
     if (x != 0.0f)
     {
@@ -48,7 +46,7 @@ inline float fastatan2(float y, float x)
             tOffset.nVal *= tXSign.nVal >> 31;
             result = tOffset.flVal;
             const float z = y / x;
-            result += (((((a1 * z) + a2) * z) + a3) * z) + a4;
+            result += (n1 + n2 * z * z) * z;
         }
         else // Use atan(y/x) = pi/2 - atan(x/y) if |y/x| > 1.
         {
@@ -57,7 +55,7 @@ inline float fastatan2(float y, float x)
             tOffset.nVal |= tYSign.nVal & 0x80000000u;
             result = tOffset.flVal;
             const float z = x / y;
-            result -= (((((a1 * z) + a2) * z) + a3) * z) + a4;
+            result -= (n1 + n2 * z * z) * z;
         }
     }
     else if (y > 0.0f)
