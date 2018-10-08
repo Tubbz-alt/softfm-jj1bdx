@@ -1,3 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////////
+// SoftFM - Software decoder for FM broadcast radio with stereo support          //
+//                                                                               //
+// Copyright (C) 2015 Edouard Griffiths, F4EXB                                   //
+//                                                                               //
+// This program is free software; you can redistribute it and/or modify          //
+// it under the terms of the GNU General Public License as published by          //
+// the Free Software Foundation as version 3 of the License, or                  //
+//                                                                               //
+// This program is distributed in the hope that it will be useful,               //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of                //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                  //
+// GNU General Public License V3 for more details.                               //
+//                                                                               //
+// You should have received a copy of the GNU General Public License             //
+// along with this program. If not, see <http://www.gnu.org/licenses/>.          //
+/////////////////////////////////////////////////////////////////////////////////// 
 
 #include <cassert>
 #include <cmath>
@@ -7,13 +24,12 @@
 
 #include "Filter.h"
 
-using namespace std;
 
 
 /** Prepare Lanczos FIR filter coefficients. */
 template <class T>
 static void make_lanczos_coeff(unsigned int filter_order, double cutoff,
-                               vector<T>& coeff)
+        std::vector<T>& coeff)
 {
     coeff.resize(filter_order + 1);
 
@@ -265,16 +281,18 @@ void DownsampleFilter::process(const SampleVector& samples_in,
 /* ****************  class LowPassFilterRC  **************** */
 
 // Construct 1st order low-pass IIR filter.
-LowPassFilterRC::LowPassFilterRC(double timeconst)
-    : m_timeconst(timeconst)
-    , m_y1(0)
+LowPassFilterRC::LowPassFilterRC(double timeconst) :
+		m_timeconst(timeconst),
+		m_y0_1(0),
+		m_y1_1(0)
 {
+    m_a1 = - exp(-1/m_timeconst);;
+    m_b0 = 1 + m_a1;
 }
 
 
 // Process samples.
-void LowPassFilterRC::process(const SampleVector& samples_in,
-                              SampleVector& samples_out)
+void LowPassFilterRC::process(const SampleVector& samples_in, SampleVector& samples_out)
 {
     /*
      * Continuous domain:
@@ -283,41 +301,92 @@ void LowPassFilterRC::process(const SampleVector& samples_in,
      * Discrete domain:
      *   H(z) = (1 - exp(-1/timeconst)) / (1 - exp(-1/timeconst) / z)
      */
-    Sample a1 = - exp(-1/m_timeconst);;
-    Sample b0 = 1 + a1;
-
     unsigned int n = samples_in.size();
     samples_out.resize(n);
 
-    Sample y = m_y1;
-    for (unsigned int i = 0; i < n; i++) {
+    Sample y = m_y0_1;
+
+    for (unsigned int i = 0; i < n; i++)
+    {
         Sample x = samples_in[i];
-        y = b0 * x - a1 * y;
+        y = m_b0 * x - m_a1 * y;
         samples_out[i] = y;
     }
 
-    m_y1 = y;
+    m_y0_1 = y;
+}
+
+// Process interleaved samples.
+void LowPassFilterRC::process_interleaved(const SampleVector& samples_in, SampleVector& samples_out)
+{
+    /*
+     * Continuous domain:
+     *   H(s) = 1 / (1 - s * timeconst)
+     *
+     * Discrete domain:
+     *   H(z) = (1 - exp(-1/timeconst)) / (1 - exp(-1/timeconst) / z)
+     */
+    unsigned int n = samples_in.size();
+    samples_out.resize(n);
+
+    Sample y0 = m_y0_1;
+    Sample y1 = m_y1_1;
+
+    for (unsigned int i = 0; i < n-1; i+=2)
+    {
+        Sample x0 = samples_in[i];
+        y0 = m_b0 * x0 - m_a1 * y0;
+        samples_out[i] = y0;
+
+        Sample x1 = samples_in[i+1];
+        y1 = m_b0 * x1 - m_a1 * y1;
+        samples_out[i+1] = y1;
+    }
+
+    m_y0_1 = y0;
+    m_y1_1 = y1;
 }
 
 
 // Process samples in-place.
 void LowPassFilterRC::process_inplace(SampleVector& samples)
 {
-    Sample a1 = - exp(-1/m_timeconst);;
-    Sample b0 = 1 + a1;
-
     unsigned int n = samples.size();
 
-    Sample y = m_y1;
-    for (unsigned int i = 0; i < n; i++) {
+    Sample y = m_y0_1;
+
+    for (unsigned int i = 0; i < n; i++)
+    {
         Sample x = samples[i];
-        y = b0 * x - a1 * y;
+        y = m_b0 * x - m_a1 * y;
         samples[i] = y;
     }
 
-    m_y1 = y;
+    m_y0_1 = y;
 }
 
+// Process interleaved samples in-place.
+void LowPassFilterRC::process_interleaved_inplace(SampleVector& samples)
+{
+    unsigned int n = samples.size();
+
+    Sample y0 = m_y0_1;
+    Sample y1 = m_y1_1;
+
+    for (unsigned int i = 0; i < n-1; i+=2)
+    {
+        Sample x0 = samples[i];
+        y0 = m_b0 * x0 - m_a1 * y0;
+        samples[i] = y0;
+
+        Sample x1 = samples[i+1];
+        y1 = m_b0 * x1 - m_a1 * y1;
+        samples[i+1] = y1;
+    }
+
+    m_y0_1 = y0;
+    m_y1_1 = y1;
+}
 
 /* ****************  class LowPassFilterIir  **************** */
 
@@ -325,7 +394,7 @@ void LowPassFilterRC::process_inplace(SampleVector& samples)
 LowPassFilterIir::LowPassFilterIir(double cutoff)
     : y1(0), y2(0), y3(0), y4(0)
 {
-    typedef complex<double> CDbl;
+    typedef std::complex<double> CDbl;
 
     // Angular cutoff frequency.
     double w = 2 * M_PI * cutoff;
@@ -385,7 +454,7 @@ void LowPassFilterIir::process(const SampleVector& samples_in,
 HighPassFilterIir::HighPassFilterIir(double cutoff)
     : x1(0), x2(0), y1(0), y2(0)
 {
-    typedef complex<double> CDbl;
+    typedef std::complex<double> CDbl;
 
     // Angular cutoff frequency.
     double w = 2 * M_PI * cutoff;

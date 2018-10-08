@@ -1,3 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////////
+// SoftFM - Software decoder for FM broadcast radio with stereo support          //
+//                                                                               //
+// Copyright (C) 2015 Edouard Griffiths, F4EXB                                   //
+//                                                                               //
+// This program is free software; you can redistribute it and/or modify          //
+// it under the terms of the GNU General Public License as published by          //
+// the Free Software Foundation as version 3 of the License, or                  //
+//                                                                               //
+// This program is distributed in the hope that it will be useful,               //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of                //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                  //
+// GNU General Public License V3 for more details.                               //
+//                                                                               //
+// You should have received a copy of the GNU General Public License             //
+// along with this program. If not, see <http://www.gnu.org/licenses/>.          //
+/////////////////////////////////////////////////////////////////////////////////// 
+
 #ifndef SOFTFM_FILTER_H
 #define SOFTFM_FILTER_H
 
@@ -109,9 +127,18 @@ public:
     /** Process samples in-place. */
     void process_inplace(SampleVector& samples);
 
+    /** Process interleaved samples. */
+    void process_interleaved(const SampleVector& samples_in, SampleVector& samples_out);
+
+    /** Process interleaved samples in-place. */
+    void process_interleaved_inplace(SampleVector& samples);
+
 private:
     double  m_timeconst;
-    Sample  m_y1;
+    Sample  m_a1;
+    Sample  m_b0;
+    Sample  m_y0_1;
+    Sample  m_y1_1;
 };
 
 
