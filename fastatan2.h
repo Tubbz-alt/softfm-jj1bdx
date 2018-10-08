@@ -49,7 +49,6 @@ inline float fastatan2(float y, float x)
             result = tOffset.flVal;
             const float z = y / x;
             result += (((((a1 * z) + a2) * z) + a3) * z) + a4;
-            // result += (n1 + n2 * z * z) * z;
         }
         else // Use atan(y/x) = pi/2 - atan(x/y) if |y/x| > 1.
         {
@@ -59,7 +58,6 @@ inline float fastatan2(float y, float x)
             result = tOffset.flVal;
             const float z = x / y;
             result -= (((((a1 * z) + a2) * z) + a3) * z) + a4;
-            // result -= (n1 + n2 * z * z) * z;
         }
     }
     else if (y > 0.0f)
