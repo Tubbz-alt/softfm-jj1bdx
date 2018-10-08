@@ -307,10 +307,8 @@ int main(int argc, char **argv)
     FILE *  ppsfile = NULL;
     double  bufsecs = -1;
 
-    if (!quietmode) {
-        fprintf(stderr,
+    fprintf(stderr,
             "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
-    }
 
     const struct option longopts[] = {
         { "freq",       1, NULL, 'f' },
