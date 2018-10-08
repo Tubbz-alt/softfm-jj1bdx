@@ -230,6 +230,7 @@ void usage()
             "  -T filename   Write pulse-per-second timestamps\n"
             "                use filename '-' to write to stdout\n"
             "  -b seconds    Set audio buffer size in seconds\n"
+            "  -q            Set quiet mode\n"
             "\n");
 }
 
@@ -300,13 +301,16 @@ int main(int argc, char **argv)
     bool    stereo  = true;
     enum OutputMode { MODE_RAW, MODE_WAV };
     OutputMode outmode = MODE_RAW;
+    bool    quietmode = false;
     string  filename;
     string  ppsfilename;
     FILE *  ppsfile = NULL;
     double  bufsecs = -1;
 
-    fprintf(stderr,
+    if (!quietmode) {
+        fprintf(stderr,
             "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
+    }
 
     const struct option longopts[] = {
         { "freq",       1, NULL, 'f' },
@@ -321,11 +325,12 @@ int main(int argc, char **argv)
         { "play",       2, NULL, 'P' },
         { "pps",        1, NULL, 'T' },
         { "buffer",     1, NULL, 'b' },
+        { "quiet",      1, NULL, 'q' },
         { NULL,         0, NULL, 0 } };
 
     int c, longindex;
     while ((c = getopt_long(argc, argv,
-                            "f:d:g:s:r:MR:W:P::T:b:a",
+                            "f:d:g:s:r:MR:W:P::T:b:aq",
                             longopts, &longindex)) >= 0) {
         switch (c) {
             case 'f':
@@ -390,6 +395,9 @@ int main(int argc, char **argv)
             case 'a':
                 agcmode = true;
                 break;
+            case 'q':
+                quietmode = true;
+                break;
             default:
                 usage();
                 fprintf(stderr, "ERROR: Invalid command line options\n");
@@ -405,15 +413,20 @@ int main(int argc, char **argv)
 
     vector<string> devnames = RtlSdrSource::get_device_names();
     if (devidx < 0 || (unsigned int)devidx >= devnames.size()) {
-        if (devidx != -1)
+        if (devidx != -1) {
             fprintf(stderr, "ERROR: invalid device index %d\n", devidx);
-        fprintf(stderr, "Found %u devices:\n", (unsigned int)devnames.size());
-        for (unsigned int i = 0; i < devnames.size(); i++) {
-            fprintf(stderr, "%2u: %s\n", i, devnames[i].c_str());
+        }
+        if (!quietmode) {
+            fprintf(stderr, "Found %u devices:\n", (unsigned int)devnames.size());
+            for (unsigned int i = 0; i < devnames.size(); i++) {
+                fprintf(stderr, "%2u: %s\n", i, devnames[i].c_str());
+            }
         }
         exit(1);
     }
-    fprintf(stderr, "using device %d: %s\n", devidx, devnames[devidx].c_str());
+    if (!quietmode) {
+        fprintf(stderr, "using device %d: %s\n", devidx, devnames[devidx].c_str());
+    }
 
     if (freq <= 0) {
         usage();
@@ -449,11 +462,13 @@ int main(int argc, char **argv)
     if (lnagain != INT_MIN) {
         vector<int> gains = rtlsdr.get_tuner_gains();
         if (find(gains.begin(), gains.end(), lnagain) == gains.end()) {
-            if (lnagain != INT_MIN + 1)
+            if (lnagain != INT_MIN + 1) {
                 fprintf(stderr, "ERROR: LNA gain %.1f dB not supported by tuner\n", lnagain * 0.1);
+            }
             fprintf(stderr, "Supported LNA gains: ");
-            for (int g: gains)
+            for (int g: gains) {
                 fprintf(stderr, " %.1f dB ", 0.1 * g);
+            }
             fprintf(stderr, "\n");
             exit(1);
         }
@@ -468,19 +483,20 @@ int main(int argc, char **argv)
     }
 
     tuner_freq = rtlsdr.get_frequency();
-    fprintf(stderr, "device tuned for:  %.6f MHz\n", tuner_freq * 1.0e-6);
+    ifrate = rtlsdr.get_sample_rate();
 
-    if (lnagain == INT_MIN)
-        fprintf(stderr, "LNA gain:          auto\n");
-    else
+    if (!quietmode) {
+        fprintf(stderr, "device tuned for:  %.6f MHz\n", tuner_freq * 1.0e-6);
+        if (lnagain == INT_MIN) {
+            fprintf(stderr, "LNA gain:          auto\n");
+        } else {
         fprintf(stderr, "LNA gain:          %.1f dB\n",
                 0.1 * rtlsdr.get_tuner_gain());
-
-    ifrate = rtlsdr.get_sample_rate();
-    fprintf(stderr, "IF sample rate:    %.0f Hz\n", ifrate);
-
-    fprintf(stderr, "RTL AGC mode:      %s\n",
-            agcmode ? "enabled" : "disabled");
+        }
+        fprintf(stderr, "IF sample rate:    %.0f Hz\n", ifrate);
+        fprintf(stderr, "RTL AGC mode:      %s\n",
+                         agcmode ? "enabled" : "disabled");
+    }
 
     // Create source data queue.
     DataBuffer<IQSample> source_buffer;
@@ -492,14 +508,16 @@ int main(int argc, char **argv)
     // downsample to ~ 200 kS/s without loss of information.
     // This will speed up later processing stages.
     unsigned int downsample = max(1, int(ifrate / 215.0e3));
-    fprintf(stderr, "baseband downsampling factor %u\n", downsample);
 
     // Prevent aliasing at very low output sample rates.
     double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
     double bandwidth_pcm = min(default_bandwidth_pcm,
                                0.45 * pcmrate);
-    fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
-    fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
+    if (!quietmode) {
+        fprintf(stderr, "baseband downsampling factor %u\n", downsample);
+        fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
+        fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
+    }
 
     // Prepare decoder.
     FmDecoder fm(ifrate,                            // sample_rate_if
@@ -522,7 +540,7 @@ int main(int argc, char **argv)
         // Calculate nr of samples for configured buffer length.
         outputbuf_samples = (unsigned int)(bufsecs * pcmrate);
     }
-    if (outputbuf_samples > 0) {
+    if (outputbuf_samples > 0 && !quietmode) {
         fprintf(stderr, "output buffer:     %.1f seconds\n",
                 outputbuf_samples / double(pcmrate));
     }
@@ -530,11 +548,15 @@ int main(int argc, char **argv)
     // Open PPS file.
     if (!ppsfilename.empty()) {
         if (ppsfilename == "-") {
-            fprintf(stderr, "writing pulse-per-second markers to stdout\n");
+            if (!quietmode) {
+                fprintf(stderr, "writing pulse-per-second markers to stdout\n");
+            }
             ppsfile = stdout;
         } else {
-            fprintf(stderr, "writing pulse-per-second markers to '%s'\n",
+            if (!quietmode) {
+                fprintf(stderr, "writing pulse-per-second markers to '%s'\n",
                     ppsfilename.c_str());
+            }
             ppsfile = fopen(ppsfilename.c_str(), "w");
             if (ppsfile == NULL) {
                 fprintf(stderr, "ERROR: can not open '%s' (%s)\n",
@@ -550,13 +572,17 @@ int main(int argc, char **argv)
     unique_ptr<AudioOutput> audio_output;
     switch (outmode) {
         case MODE_RAW:
-            fprintf(stderr, "writing raw 16-bit audio samples to '%s'\n",
+            if (!quietmode) {
+                fprintf(stderr, "writing raw 16-bit audio samples to '%s'\n",
                     filename.c_str());
+            }
             audio_output.reset(new RawAudioOutput(filename));
             break;
         case MODE_WAV:
-            fprintf(stderr, "writing audio samples to '%s'\n",
+            if (!quietmode) {
+                fprintf(stderr, "writing audio samples to '%s'\n",
                     filename.c_str());
+            }
             audio_output.reset(new WavAudioOutput(filename, pcmrate, stereo));
             break;
     }
@@ -616,30 +642,36 @@ int main(int argc, char **argv)
         adjust_gain(audiosamples, 0.5);
 
         // Show statistics.
-        fprintf(stderr,
+
+        if (!quietmode) {
+            fprintf(stderr,
                 "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
                 block,
                 (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
                 20*log10(fm.get_if_level()),
                 20*log10(fm.get_baseband_level()) + 3.01,
                 20*log10(audio_level) + 3.01);
-        if (outputbuf_samples > 0) {
-            unsigned int nchannel = stereo ? 2 : 1;
-            size_t buflen = output_buffer.queued_samples();
-            fprintf(stderr,
+            if (outputbuf_samples > 0) {
+                unsigned int nchannel = stereo ? 2 : 1;
+                size_t buflen = output_buffer.queued_samples();
+                fprintf(stderr,
                     " buf=%.1fs ",
                     buflen / nchannel / double(pcmrate));
+            }
+            fflush(stderr);
         }
-        fflush(stderr);
 
         // Show stereo status.
         if (fm.stereo_detected() != got_stereo) {
             got_stereo = fm.stereo_detected();
-            if (got_stereo)
-                fprintf(stderr, "\ngot stereo signal (pilot level = %f)\n",
+            if (!quietmode) {
+                if (got_stereo) {
+                    fprintf(stderr, "\ngot stereo signal (pilot level = %f)\n",
                         fm.get_pilot_level());
-            else
-                fprintf(stderr, "\nlost stereo signal\n");
+                } else {
+                    fprintf(stderr, "\nlost stereo signal\n");
+                }
+            }
         }
 
         // Write PPS markers.
@@ -671,7 +703,9 @@ int main(int argc, char **argv)
 
     }
 
-    fprintf(stderr, "\n");
+    if (!quietmode) {
+        fprintf(stderr, "\n");
+    }
 
     // Join background threads.
     source_thread.join();
