@@ -22,247 +22,219 @@
 
 #define _FILE_OFFSET_BITS 64
 
-#include <unistd.h>
-#include <fcntl.h>
+#include <algorithm>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <cerrno>
-#include <algorithm>
+#include <fcntl.h>
+#include <unistd.h>
 
-extern "C"
-{
-    #include <assert.h>
+extern "C" {
+#include <assert.h>
 }
 
-#include "SoftFM.h"
 #include "AudioOutput.h"
+#include "SoftFM.h"
 
 using namespace std;
-
 
 /* ****************  class AudioOutput  **************** */
 
 // Encode a list of samples as signed 16-bit little-endian integers.
-void AudioOutput::samplesToInt16(const SampleVector& samples,
-                                 vector<uint8_t>& bytes)
-{
-    bytes.resize(2 * samples.size());
+void AudioOutput::samplesToInt16(const SampleVector &samples,
+                                 vector<uint8_t> &bytes) {
+  bytes.resize(2 * samples.size());
 
-    SampleVector::const_iterator i = samples.begin();
-    SampleVector::const_iterator n = samples.end();
-    vector<uint8_t>::iterator k = bytes.begin();
+  SampleVector::const_iterator i = samples.begin();
+  SampleVector::const_iterator n = samples.end();
+  vector<uint8_t>::iterator k = bytes.begin();
 
-    while (i != n) {
-        Sample s = *(i++);
-        s = max(Sample(-1.0), min(Sample(1.0), s));
-        long v = lrint(s * 32767);
-        unsigned long u = v;
-        *(k++) = u & 0xff;
-        *(k++) = (u >> 8) & 0xff;
-    }
+  while (i != n) {
+    Sample s = *(i++);
+    s = max(Sample(-1.0), min(Sample(1.0), s));
+    long v = lrint(s * 32767);
+    unsigned long u = v;
+    *(k++) = u & 0xff;
+    *(k++) = (u >> 8) & 0xff;
+  }
 }
-
 
 /* ****************  class RawAudioOutput  **************** */
 
 // Construct raw audio writer.
-RawAudioOutput::RawAudioOutput(const string& filename)
-{
-    if (filename == "-") {
+RawAudioOutput::RawAudioOutput(const string &filename) {
+  if (filename == "-") {
 
-        m_fd = STDOUT_FILENO;
+    m_fd = STDOUT_FILENO;
 
-    } else {
+  } else {
 
-        m_fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-        if (m_fd < 0) {
-            m_error  = "can not open '" + filename + "' (" +
-                       strerror(errno) + ")";
-            m_zombie = true;
-            return;
-        }
-
+    m_fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (m_fd < 0) {
+      m_error = "can not open '" + filename + "' (" + strerror(errno) + ")";
+      m_zombie = true;
+      return;
     }
+  }
 }
-
 
 // Destructor.
-RawAudioOutput::~RawAudioOutput()
-{
-    // Close file descriptor.
-    if (m_fd >= 0 && m_fd != STDOUT_FILENO) {
-        close(m_fd);
-    }
+RawAudioOutput::~RawAudioOutput() {
+  // Close file descriptor.
+  if (m_fd >= 0 && m_fd != STDOUT_FILENO) {
+    close(m_fd);
+  }
 }
-
 
 // Write audio data.
-bool RawAudioOutput::write(const SampleVector& samples)
-{
-    if (m_fd < 0)
-        return false;
+bool RawAudioOutput::write(const SampleVector &samples) {
+  if (m_fd < 0)
+    return false;
 
-    // Convert samples to bytes.
-    samplesToInt16(samples, m_bytebuf);
+  // Convert samples to bytes.
+  samplesToInt16(samples, m_bytebuf);
 
-    // Write data.
-    size_t p = 0;
-    size_t n = m_bytebuf.size();
-    while (p < n) {
+  // Write data.
+  size_t p = 0;
+  size_t n = m_bytebuf.size();
+  while (p < n) {
 
-        ssize_t k = ::write(m_fd, m_bytebuf.data() + p, n - p);
-        if (k <= 0) {
-            if (k == 0 || errno != EINTR) {
-                m_error = "write failed (";
-                m_error += strerror(errno);
-                m_error += ")";
-                return false;
-            }
-        } else {
-            p += k;
-        }
-    }
-
-    return true;
-}
-
-
-/* ****************  class WavAudioOutput  **************** */
-
-// Construct .WAV writer.
-WavAudioOutput::WavAudioOutput(const std::string& filename,
-                               unsigned int samplerate,
-                               bool stereo)
-  : numberOfChannels(stereo ? 2 : 1)
-  , sampleRate(samplerate)
-{
-    m_stream = fopen(filename.c_str(), "wb");
-    if (m_stream == NULL) {
-        m_error  = "can not open '" + filename + "' (" +
-                   strerror(errno) + ")";
-        m_zombie = true;
-        return;
-    }
-
-    // Write initial header with a dummy sample count.
-    // This will be replaced with the actual header once the WavFile is closed.
-    if (!write_header(0x7fff0000)) {
-        m_error = "can not write to '" + filename + "' (" +
-                  strerror(errno) + ")";
-        m_zombie = true;
-    }
-}
-
-
-// Destructor.
-WavAudioOutput::~WavAudioOutput()
-{
-    // We need to go back and fill in the header ...
-
-    if (!m_zombie) {
-
-        const unsigned bytesPerSample = 2;
-
-        const long currentPosition = ftell(m_stream);
-
-        assert((currentPosition - 44) % bytesPerSample == 0);
-
-        const unsigned totalNumberOfSamples = (currentPosition - 44) / bytesPerSample;
-
-        assert(totalNumberOfSamples % numberOfChannels == 0);
-
-        // Put header in front
-
-        if (fseek(m_stream, 0, SEEK_SET) == 0) {
-            write_header(totalNumberOfSamples);
-        }
-    }
-
-    // Done writing the file
-
-    if (m_stream) {
-        fclose(m_stream);
-    }
-}
-
-
-// Write audio data.
-bool WavAudioOutput::write(const SampleVector& samples)
-{
-    if (m_zombie)
-        return false;
-
-    // Convert samples to bytes.
-    samplesToInt16(samples, m_bytebuf);
-
-    // Write samples to file.
-    size_t k = fwrite(m_bytebuf.data(), 1, m_bytebuf.size(), m_stream);
-    if (k != m_bytebuf.size()) {
+    ssize_t k = ::write(m_fd, m_bytebuf.data() + p, n - p);
+    if (k <= 0) {
+      if (k == 0 || errno != EINTR) {
         m_error = "write failed (";
         m_error += strerror(errno);
         m_error += ")";
         return false;
+      }
+    } else {
+      p += k;
     }
+  }
 
-    return true;
+  return true;
 }
 
+/* ****************  class WavAudioOutput  **************** */
+
+// Construct .WAV writer.
+WavAudioOutput::WavAudioOutput(const std::string &filename,
+                               unsigned int samplerate, bool stereo)
+    : numberOfChannels(stereo ? 2 : 1), sampleRate(samplerate) {
+  m_stream = fopen(filename.c_str(), "wb");
+  if (m_stream == NULL) {
+    m_error = "can not open '" + filename + "' (" + strerror(errno) + ")";
+    m_zombie = true;
+    return;
+  }
+
+  // Write initial header with a dummy sample count.
+  // This will be replaced with the actual header once the WavFile is closed.
+  if (!write_header(0x7fff0000)) {
+    m_error = "can not write to '" + filename + "' (" + strerror(errno) + ")";
+    m_zombie = true;
+  }
+}
+
+// Destructor.
+WavAudioOutput::~WavAudioOutput() {
+  // We need to go back and fill in the header ...
+
+  if (!m_zombie) {
+
+    const unsigned bytesPerSample = 2;
+
+    const long currentPosition = ftell(m_stream);
+
+    assert((currentPosition - 44) % bytesPerSample == 0);
+
+    const unsigned totalNumberOfSamples =
+        (currentPosition - 44) / bytesPerSample;
+
+    assert(totalNumberOfSamples % numberOfChannels == 0);
+
+    // Put header in front
+
+    if (fseek(m_stream, 0, SEEK_SET) == 0) {
+      write_header(totalNumberOfSamples);
+    }
+  }
+
+  // Done writing the file
+
+  if (m_stream) {
+    fclose(m_stream);
+  }
+}
+
+// Write audio data.
+bool WavAudioOutput::write(const SampleVector &samples) {
+  if (m_zombie)
+    return false;
+
+  // Convert samples to bytes.
+  samplesToInt16(samples, m_bytebuf);
+
+  // Write samples to file.
+  size_t k = fwrite(m_bytebuf.data(), 1, m_bytebuf.size(), m_stream);
+  if (k != m_bytebuf.size()) {
+    m_error = "write failed (";
+    m_error += strerror(errno);
+    m_error += ")";
+    return false;
+  }
+
+  return true;
+}
 
 // (Re)write .WAV header.
-bool WavAudioOutput::write_header(unsigned int nsamples)
-{
-    const unsigned bytesPerSample = 2;
-    const unsigned bitsPerSample  = 16;
+bool WavAudioOutput::write_header(unsigned int nsamples) {
+  const unsigned bytesPerSample = 2;
+  const unsigned bitsPerSample = 16;
 
-    enum wFormatTagId
-    {
-        WAVE_FORMAT_PCM        = 0x0001,
-        WAVE_FORMAT_IEEE_FLOAT = 0x0003
-    };
+  enum wFormatTagId {
+    WAVE_FORMAT_PCM = 0x0001,
+    WAVE_FORMAT_IEEE_FLOAT = 0x0003
+  };
 
-    assert(nsamples % numberOfChannels == 0);
+  assert(nsamples % numberOfChannels == 0);
 
-    // synthesize header
+  // synthesize header
 
-    uint8_t wavHeader[44];
+  uint8_t wavHeader[44];
 
-    encode_chunk_id    (wavHeader +  0, "RIFF");
-    set_value<uint32_t>(wavHeader +  4, 36 + nsamples * bytesPerSample);
-    encode_chunk_id    (wavHeader +  8, "WAVE");
-    encode_chunk_id    (wavHeader + 12, "fmt ");
-    set_value<uint32_t>(wavHeader + 16, 16);
-    set_value<uint16_t>(wavHeader + 20, WAVE_FORMAT_PCM);
-    set_value<uint16_t>(wavHeader + 22, numberOfChannels);
-    set_value<uint32_t>(wavHeader + 24, sampleRate                                    ); // sample rate
-    set_value<uint32_t>(wavHeader + 28, sampleRate * numberOfChannels * bytesPerSample); // byte rate
-    set_value<uint16_t>(wavHeader + 32,              numberOfChannels * bytesPerSample); // block size
-    set_value<uint16_t>(wavHeader + 34, bitsPerSample);
-    encode_chunk_id    (wavHeader + 36, "data");
-    set_value<uint32_t>(wavHeader + 40, nsamples * bytesPerSample);
+  encode_chunk_id(wavHeader + 0, "RIFF");
+  set_value<uint32_t>(wavHeader + 4, 36 + nsamples * bytesPerSample);
+  encode_chunk_id(wavHeader + 8, "WAVE");
+  encode_chunk_id(wavHeader + 12, "fmt ");
+  set_value<uint32_t>(wavHeader + 16, 16);
+  set_value<uint16_t>(wavHeader + 20, WAVE_FORMAT_PCM);
+  set_value<uint16_t>(wavHeader + 22, numberOfChannels);
+  set_value<uint32_t>(wavHeader + 24, sampleRate); // sample rate
+  set_value<uint32_t>(wavHeader + 28, sampleRate * numberOfChannels *
+                                          bytesPerSample); // byte rate
+  set_value<uint16_t>(wavHeader + 32,
+                      numberOfChannels * bytesPerSample); // block size
+  set_value<uint16_t>(wavHeader + 34, bitsPerSample);
+  encode_chunk_id(wavHeader + 36, "data");
+  set_value<uint32_t>(wavHeader + 40, nsamples * bytesPerSample);
 
-    return fwrite(wavHeader, 1, 44, m_stream) == 44;
+  return fwrite(wavHeader, 1, 44, m_stream) == 44;
 }
 
-
-void WavAudioOutput::encode_chunk_id(uint8_t * ptr, const char * chunkname)
-{
-    for (unsigned i = 0; i < 4; ++i)
-    {
-        assert(chunkname[i] != '\0');
-        ptr[i] = chunkname[i];
-    }
-    assert(chunkname[4] == '\0');
+void WavAudioOutput::encode_chunk_id(uint8_t *ptr, const char *chunkname) {
+  for (unsigned i = 0; i < 4; ++i) {
+    assert(chunkname[i] != '\0');
+    ptr[i] = chunkname[i];
+  }
+  assert(chunkname[4] == '\0');
 }
 
-
-template <typename T>
-void WavAudioOutput::set_value(uint8_t * ptr, T value)
-{
-    for (size_t i = 0; i < sizeof(T); ++i)
-    {
-        ptr[i] = value & 0xff;
-        value >>= 8;
-    }
+template <typename T> void WavAudioOutput::set_value(uint8_t *ptr, T value) {
+  for (size_t i = 0; i < sizeof(T); ++i) {
+    ptr[i] = value & 0xff;
+    value >>= 8;
+  }
 }
 
 /* end */
