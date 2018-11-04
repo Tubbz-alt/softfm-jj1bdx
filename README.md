@@ -75,37 +75,13 @@ top level directory. Then do like this:
     
     # ( enjoy music )
 
+## Authors
+
+* Joris van Rantwijk
+* Edouard Griffiths, F4EXB
+* Kenji Rikitake, JJ1BDX
 
 ## License
 
-GPL2 (although some code specifies GPL3).
-
-**NGSoftFM**, copyright (C) 2015, Edouard Griffiths, F4EXB
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, see http://www.gnu.org/licenses/gpl-2.0.html
-
-SoftFM, copyright (C) 2013, Joris van Rantwijk
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, see http://www.gnu.org/licenses/gpl-2.0.html
+* As a whole package: GPLv3 (and later). See [LICENSE](LICENSE).
+* Some source code files are stating GPL "v2 and later" license.
