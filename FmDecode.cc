@@ -5,8 +5,6 @@
 #include "FmDecode.h"
 #include "fastatan2.h"
 
-using namespace std;
-
 /** Compute RMS level over a small prefix of the specified sample vector. */
 static IQSample::value_type rms_level_approx(const IQSampleVector &samples) {
   unsigned int n = samples.size();
@@ -163,14 +161,14 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
     }
 
     // Detect pilot level (conservative).
-    m_pilot_level = min(m_pilot_level, phasor_i);
+    m_pilot_level = std::min(m_pilot_level, phasor_i);
 
     // Run phase error through loop filter and update frequency estimate.
     m_freq += m_loopfilter_b0 * phase_err + m_loopfilter_b1 * m_loopfilter_x1;
     m_loopfilter_x1 = phase_err;
 
     // Limit frequency to allowable range.
-    m_freq = max(m_minfreq, min(m_maxfreq, m_freq));
+    m_freq = std::max(m_minfreq, std::min(m_maxfreq, m_freq));
 
     // Update locked phase.
     m_phase += m_freq;
