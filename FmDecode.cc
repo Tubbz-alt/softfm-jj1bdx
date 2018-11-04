@@ -30,21 +30,20 @@ PhaseDiscriminator::PhaseDiscriminator(double max_freq_dev)
 void PhaseDiscriminator::process(const IQSampleVector &samples_in,
                                  SampleVector &samples_out) {
   unsigned int n = samples_in.size();
-  IQSample s0 = m_last_sample;
+  IQSample s0 = m_last1_sample;
 
   samples_out.resize(n);
 
   for (unsigned int i = 0; i < n; i++) {
     IQSample s1(samples_in[i]);
     IQSample d(conj(s0) * s1);
-    // Sample w = atan2(d.imag(), d.real());
-    // using fast approximation
     Sample w = fastatan2(d.imag(), d.real());
     samples_out[i] = w * m_freq_scale_factor;
     s0 = s1;
   }
 
-  m_last_sample = s0;
+  m_last2_sample = m_last1_sample;
+  m_last1_sample = s0;
 }
 
 /* ****************  class PilotPhaseLock  **************** */
