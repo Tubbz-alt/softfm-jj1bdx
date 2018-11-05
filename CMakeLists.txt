@@ -67,6 +67,7 @@ set(sfmbase_HEADERS
 	include/FmDecode.h
 	include/RtlSdrSource.h
 	include/SoftFM.h
+	include/util.h
 )
 
 set(sfmbase_SOURCES

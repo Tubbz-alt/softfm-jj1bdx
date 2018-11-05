@@ -36,6 +36,7 @@
 #include "FmDecode.h"
 #include "RtlSdrSource.h"
 #include "SoftFM.h"
+#include "util.h"
 
 /** Flag is set on SIGINT / SIGTERM. */
 static std::atomic_bool stop_flag(false);
@@ -228,24 +229,6 @@ bool parse_int(const char *s, int &v, bool allow_unit = false) {
     return false;
   v = t;
   return true;
-}
-
-bool parse_dbl(const char *s, double &v) {
-  char *endp;
-  v = strtod(s, &endp);
-  if (endp == s)
-    return false;
-  if (*endp == 'k') {
-    v *= 1.0e3;
-    endp++;
-  } else if (*endp == 'M') {
-    v *= 1.0e6;
-    endp++;
-  } else if (*endp == 'G') {
-    v *= 1.0e9;
-    endp++;
-  }
-  return (*endp == '\0');
 }
 
 /** Return Unix time stamp in seconds. */
