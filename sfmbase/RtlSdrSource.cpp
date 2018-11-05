@@ -147,7 +147,7 @@ bool RtlSdrSource::get_samples(IQSampleVector &samples) {
 
 // Return a list of supported devices.
 std::vector<std::string> RtlSdrSource::get_device_names() {
-    std::vector<std::string> result;
+  std::vector<std::string> result;
 
   int device_count = rtlsdr_get_device_count();
   if (device_count <= 0)

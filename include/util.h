@@ -18,34 +18,27 @@
 #ifndef INCLUDE_UTIL_H_
 #define INCLUDE_UTIL_H_
 
-inline bool parse_dbl(const char *s, double& v)
-{
-    char *endp;
+inline bool parse_dbl(const char *s, double &v) {
+  char *endp;
 
-    v = strtod(s, &endp);
+  v = strtod(s, &endp);
 
-    if (endp == s)
-    {
-        return false;
-    }
+  if (endp == s) {
+    return false;
+  }
 
-    if (*endp == 'k')
-    {
-        v *= 1.0e3;
-        endp++;
-    }
-    else if (*endp == 'M')
-    {
-        v *= 1.0e6;
-        endp++;
-    }
-    else if (*endp == 'G')
-    {
-        v *= 1.0e9;
-        endp++;
-    }
+  if (*endp == 'k') {
+    v *= 1.0e3;
+    endp++;
+  } else if (*endp == 'M') {
+    v *= 1.0e6;
+    endp++;
+  } else if (*endp == 'G') {
+    v *= 1.0e9;
+    endp++;
+  }
 
-    return (*endp == '\0');
+  return (*endp == '\0');
 }
 
 #endif // INCLUDE_UTIL_H_

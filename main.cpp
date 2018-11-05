@@ -77,7 +77,7 @@ public:
   // an empty vector. If the queue is empty, wait until more data is pushed
   // or until the end marker is pushed.
   std::vector<Element> pull() {
-      std::vector<Element> ret;
+    std::vector<Element> ret;
     std::unique_lock<std::mutex> lock(m_mutex);
     while (m_queue.empty() && !m_end_marked)
       m_cond.wait(lock);
@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
 
   // Check LNA gain.
   if (lnagain != INT_MIN) {
-      std::vector<int> gains = rtlsdr.get_tuner_gains();
+    std::vector<int> gains = rtlsdr.get_tuner_gains();
     if (find(gains.begin(), gains.end(), lnagain) == gains.end()) {
       if (lnagain != INT_MIN + 1) {
         fprintf(stderr, "ERROR: LNA gain %.1f dB not supported by tuner\n",
@@ -524,7 +524,7 @@ int main(int argc, char **argv) {
   if (outputbuf_samples > 0) {
     unsigned int nchannel = stereo ? 2 : 1;
     output_thread = std::thread(write_output_data, audio_output.get(),
-                           &output_buffer, outputbuf_samples * nchannel);
+                                &output_buffer, outputbuf_samples * nchannel);
   }
 
   SampleVector audiosamples;
@@ -598,7 +598,8 @@ int main(int argc, char **argv) {
       for (const PilotPhaseLock::PpsEvent &ev : fm.get_pps_events()) {
         double ts = prev_block_time;
         ts += ev.block_position * (block_time - prev_block_time);
-        fprintf(ppsfile, "%8s %14s %18.6f\n", std::to_string(ev.pps_index).c_str(),
+        fprintf(ppsfile, "%8s %14s %18.6f\n",
+                std::to_string(ev.pps_index).c_str(),
                 std::to_string(ev.sample_index).c_str(), ts);
         fflush(ppsfile);
       }
