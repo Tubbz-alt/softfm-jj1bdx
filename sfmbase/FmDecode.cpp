@@ -145,13 +145,14 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
     if (phasor_i > abs(phasor_q)) {
       // We are within +/- 45 degrees from lock.
       // Use simple linear approximation of arctan.
+      // This is 4/pi times the real arctan value in radian
       phase_err = phasor_q / phasor_i;
     } else if (phasor_q > 0) {
       // We are lagging more than 45 degrees behind the input.
-      phase_err = 1;
+      phase_err = 2 - phasor_i / phasor_q;
     } else {
       // We are more than 45 degrees ahead of the input.
-      phase_err = -1;
+      phase_err = phasor_i / phasor_q - 2;
     }
 
     // Detect pilot level (conservative).
