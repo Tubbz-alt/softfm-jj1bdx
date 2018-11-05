@@ -1,6 +1,6 @@
 # CMake definitions for SoftFM
 
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0.2)
 project(SoftFM)
 
 # Workaround for the compilation warning
@@ -41,21 +41,47 @@ set(RTLSDR_LIBRARIES    ${RTLSDR_LIBRARY} ${LIBUSB_LIBRARY})
 # Compiler flags.
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3 -ffast-math -ftree-vectorize ${EXTRA_FLAGS}")
 
+set(sfmbase_SOURCES
+    sfmbase/RtlSdrSource.cpp
+    sfmbase/Filter.cpp
+    sfmbase/FmDecode.cpp
+    sfmbase/AudioOutput.cpp 
+)
+
+set(sfmbase_HEADERS
+	include/AudioOutput.h
+	include/Filter.h
+	include/FmDecode.h
+	include/RtlSdrSource.h
+	include/SoftFM.h
+)
+
+set(sfmbase_SOURCES
+	${sfmbase_SOURCES}
+	${sfmbase_HEADERS}
+)
+
+add_library(sfmbase STATIC
+	${sfmbase_SOURCES}
+)
+
 add_executable(softfm
-    main.cc
-    RtlSdrSource.cc
-    Filter.cc
-    FmDecode.cc
-    AudioOutput.cc )
+	main.cpp
+)
 
 include_directories(
+	${CMAKE_SOURCE_DIR}/include
     ${RTLSDR_INCLUDE_DIRS}
-    ${EXTRA_INCLUDES} )
+    ${EXTRA_INCLUDES}
+)
 
 target_link_libraries(softfm
+	sfmbase
     ${CMAKE_THREAD_LIBS_INIT}
     ${RTLSDR_LIBRARIES}
-    ${EXTRA_LIBS} )
+    ${EXTRA_LIBS} 
+)
 
 install(TARGETS softfm DESTINATION bin)
+install(TARGETS sfmbase DESTINATION lib)
 
