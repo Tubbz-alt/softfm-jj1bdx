@@ -5,8 +5,6 @@
 #include "FmDecode.h"
 #include "fastatan2.h"
 
-using namespace std;
-
 /** Compute RMS level over a small prefix of the specified sample vector. */
 static IQSample::value_type rms_level_approx(const IQSampleVector &samples) {
   unsigned int n = samples.size();
@@ -32,21 +30,20 @@ PhaseDiscriminator::PhaseDiscriminator(double max_freq_dev)
 void PhaseDiscriminator::process(const IQSampleVector &samples_in,
                                  SampleVector &samples_out) {
   unsigned int n = samples_in.size();
-  IQSample s0 = m_last_sample;
+  IQSample s0 = m_last1_sample;
 
   samples_out.resize(n);
 
   for (unsigned int i = 0; i < n; i++) {
     IQSample s1(samples_in[i]);
     IQSample d(conj(s0) * s1);
-    // Sample w = atan2(d.imag(), d.real());
-    // using fast approximation
     Sample w = fastatan2(d.imag(), d.real());
     samples_out[i] = w * m_freq_scale_factor;
     s0 = s1;
   }
 
-  m_last_sample = s0;
+  m_last2_sample = m_last1_sample;
+  m_last1_sample = s0;
 }
 
 /* ****************  class PilotPhaseLock  **************** */
@@ -163,14 +160,14 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
     }
 
     // Detect pilot level (conservative).
-    m_pilot_level = min(m_pilot_level, phasor_i);
+    m_pilot_level = std::min(m_pilot_level, phasor_i);
 
     // Run phase error through loop filter and update frequency estimate.
     m_freq += m_loopfilter_b0 * phase_err + m_loopfilter_b1 * m_loopfilter_x1;
     m_loopfilter_x1 = phase_err;
 
     // Limit frequency to allowable range.
-    m_freq = max(m_minfreq, min(m_maxfreq, m_freq));
+    m_freq = std::max(m_minfreq, std::min(m_maxfreq, m_freq));
 
     // Update locked phase.
     m_phase += m_freq;
