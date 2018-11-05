@@ -17,7 +17,7 @@
 
 ## Requirement
 
-* Linux or macOS
+* Linux or macOS (also buildable on FreeBSD)
 * C++11 (gcc and clang will do)
 * [RTL-SDR library](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
 * Supported DVB-T receiver
