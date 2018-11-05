@@ -141,19 +141,8 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
     m_phasor_q1 = phasor_q;
 
     // Convert I/Q ratio to estimate of phase error.
-    Sample phase_err;
-    if (phasor_i > abs(phasor_q)) {
-      // We are within +/- 45 degrees from lock.
-      // Use simple linear approximation of arctan.
-      // This is 4/pi times the real arctan value in radian
-      phase_err = phasor_q / phasor_i;
-    } else if (phasor_q > 0) {
-      // We are lagging more than 45 degrees behind the input.
-      phase_err = 2 - phasor_i / phasor_q;
-    } else {
-      // We are more than 45 degrees ahead of the input.
-      phase_err = phasor_i / phasor_q - 2;
-    }
+    // float <-> double conversion error exists, but anyway...
+    Sample phase_err = fastatan2(phasor_q, phasor_i);
 
     // Detect pilot level (conservative).
     m_pilot_level = std::min(m_pilot_level, phasor_i);
