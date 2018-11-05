@@ -48,4 +48,4 @@ inline bool parse_dbl(const char *s, double& v)
     return (*endp == '\0');
 }
 
-#endif /* INCLUDE_UTIL_H_ */
+#endif // INCLUDE_UTIL_H_

@@ -1,24 +1,22 @@
-/*
- *  Audio output handling for SoftFM
- *
- *  Copyright (C) 2013, Joris van Rantwijk.
- *
- *  .WAV file writing by Sidney Cadot,
- *  adapted for SoftFM by Joris van Rantwijk.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, see http://www.gnu.org/licenses/gpl-2.0.html
- */
+// Audio output handling for SoftFM
+//
+// Copyright (C) 2013, Joris van Rantwijk.
+//
+// .WAV file writing by Sidney Cadot,
+// adapted for SoftFM by Joris van Rantwijk.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/gpl-2.0.html
 
 #define _FILE_OFFSET_BITS 64
 
@@ -36,7 +34,7 @@ extern "C" {
 #include "AudioOutput.h"
 #include "SoftFM.h"
 
-/* ****************  class AudioOutput  **************** */
+// class AudioOutput
 
 // Encode a list of samples as signed 16-bit little-endian integers.
 void AudioOutput::samplesToInt16(const SampleVector &samples,
@@ -57,7 +55,7 @@ void AudioOutput::samplesToInt16(const SampleVector &samples,
   }
 }
 
-/* ****************  class RawAudioOutput  **************** */
+// class RawAudioOutput
 
 // Construct raw audio writer.
 RawAudioOutput::RawAudioOutput(const std::string &filename) {
@@ -113,7 +111,7 @@ bool RawAudioOutput::write(const SampleVector &samples) {
   return true;
 }
 
-/* ****************  class WavAudioOutput  **************** */
+// class WavAudioOutput
 
 // Construct .WAV writer.
 WavAudioOutput::WavAudioOutput(const std::string &filename,

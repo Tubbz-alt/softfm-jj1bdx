@@ -72,4 +72,4 @@ inline float fastatan2(float y, float x) {
   return result;
 }
 
-#endif /* INCLUDE_FASTATAN2_H_ */
+#endif // INCLUDE_FASTATAN2_H_

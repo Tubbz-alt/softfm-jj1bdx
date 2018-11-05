@@ -23,7 +23,7 @@
 
 #include "Filter.h"
 
-/** Prepare Lanczos FIR filter coefficients. */
+// Prepare Lanczos FIR filter coefficients.
 template <class T>
 static void make_lanczos_coeff(unsigned int filter_order, double cutoff,
                                std::vector<T> &coeff) {
@@ -59,7 +59,7 @@ static void make_lanczos_coeff(unsigned int filter_order, double cutoff,
   }
 }
 
-/* ****************  class FineTuner  **************** */
+// class FineTuner
 
 // Construct finetuner.
 FineTuner::FineTuner(unsigned int table_size, int freq_shift)
@@ -92,7 +92,7 @@ void FineTuner::process(const IQSampleVector &samples_in,
   m_index = tblidx;
 }
 
-/* ****************  class LowPassFilterFirIQ  **************** */
+// class LowPassFilterFirIQ
 
 // Construct low-pass filter.
 LowPassFilterFirIQ::LowPassFilterFirIQ(unsigned int filter_order, double cutoff)
@@ -144,7 +144,7 @@ void LowPassFilterFirIQ::process(const IQSampleVector &samples_in,
   }
 }
 
-/* ****************  class DownsampleFilter  **************** */
+// class DownsampleFilter
 
 // Construct low-pass filter with optional downsampling.
 DownsampleFilter::DownsampleFilter(unsigned int filter_order, double cutoff,
@@ -256,7 +256,7 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   }
 }
 
-/* ****************  class LowPassFilterRC  **************** */
+// class LowPassFilterRC
 
 // Construct 1st order low-pass IIR filter.
 LowPassFilterRC::LowPassFilterRC(double timeconst)
@@ -356,7 +356,7 @@ void LowPassFilterRC::process_interleaved_inplace(SampleVector &samples) {
   m_y1_1 = y1;
 }
 
-/* ****************  class LowPassFilterIir  **************** */
+// class LowPassFilterIir
 
 // Construct 4th order low-pass IIR filter.
 LowPassFilterIir::LowPassFilterIir(double cutoff) : y1(0), y2(0), y3(0), y4(0) {
@@ -414,7 +414,7 @@ void LowPassFilterIir::process(const SampleVector &samples_in,
   }
 }
 
-/* ****************  class HighPassFilterIir  **************** */
+// class HighPassFilterIir
 
 // Construct 2nd order high-pass IIR filter.
 HighPassFilterIir::HighPassFilterIir(double cutoff)
@@ -487,4 +487,4 @@ void HighPassFilterIir::process_inplace(SampleVector &samples) {
   }
 }
 
-/* end */
+// end

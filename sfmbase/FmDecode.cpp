@@ -1,11 +1,10 @@
-
 #include <cassert>
 #include <cmath>
 
 #include "FmDecode.h"
 #include "fastatan2.h"
 
-/** Compute RMS level over a small prefix of the specified sample vector. */
+// Compute RMS level over a small prefix of the specified sample vector.
 static IQSample::value_type rms_level_approx(const IQSampleVector &samples) {
   unsigned int n = samples.size();
   n = (n + 63) / 64;
@@ -20,7 +19,7 @@ static IQSample::value_type rms_level_approx(const IQSampleVector &samples) {
   return sqrt(level / n);
 }
 
-/* ****************  class PhaseDiscriminator  **************** */
+// class PhaseDiscriminator
 
 // Construct phase discriminator.
 PhaseDiscriminator::PhaseDiscriminator(double max_freq_dev)
@@ -46,23 +45,19 @@ void PhaseDiscriminator::process(const IQSampleVector &samples_in,
   m_last1_sample = s0;
 }
 
-/* ****************  class PilotPhaseLock  **************** */
+// class PilotPhaseLock
 
 // Construct phase-locked loop.
 PilotPhaseLock::PilotPhaseLock(double freq, double bandwidth,
                                double minsignal) {
-  /*
-   * This is a type-2, 4th order phase-locked loop.
-   *
-   * Open-loop transfer function:
-   *   G(z) = K * (z - q1) / ((z - p1) * (z - p2) * (z - 1) * (z - 1))
-   *   K  = 3.788 * (bandwidth * 2 * Pi)**3
-   *   q1 = exp(-0.1153 * bandwidth * 2*Pi)
-   *   p1 = exp(-1.146 * bandwidth * 2*Pi)
-   *   p2 = exp(-5.331 * bandwidth * 2*Pi)
-   *
-   * I don't understand what I'm doing; hopefully it will work.
-   */
+  // This is a type-2, 4th order phase-locked loop.
+  // Open-loop transfer function:
+  //   G(z) = K * (z - q1) / ((z - p1) * (z - p2) * (z - 1) * (z - 1))
+  //   K  = 3.788 * (bandwidth * 2 * Pi)**3
+  //   q1 = exp(-0.1153 * bandwidth * 2*Pi)
+  //   p1 = exp(-1.146 * bandwidth * 2*Pi)
+  //   p2 = exp(-5.331 * bandwidth * 2*Pi)
+  // I don't understand what I'm doing; hopefully it will work.
 
   // Set min/max locking frequencies.
   m_minfreq = (freq - bandwidth) * 2.0 * M_PI;
@@ -209,7 +204,7 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
   m_sample_cnt += n;
 }
 
-/* ****************  class FmDecoder  **************** */
+// class FmDecoder
 
 FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
                      double sample_rate_pcm, bool stereo, double deemphasis,
@@ -395,4 +390,4 @@ void FmDecoder::stereo_to_left_right(const SampleVector &samples_mono,
   }
 }
 
-/* end */
+// end

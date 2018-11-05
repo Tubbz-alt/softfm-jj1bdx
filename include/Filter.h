@@ -21,21 +21,17 @@
 #include "SoftFM.h"
 #include <vector>
 
-/** Fine tuner which shifts the frequency of an IQ signal by a fixed offset. */
+// Fine tuner which shifts the frequency of an IQ signal by a fixed offset.
 class FineTuner {
 public:
-  /**
-   * Construct fine tuner.
-   *
-   * table_size :: Size of internal sin/cos tables, determines the resolution
-   *               of the frequency shift.
-   *
-   * freq_shift :: Frequency shift. Signal frequency will be shifted by
-   *               (sample_rate * freq_shift / table_size).
-   */
+  // Construct fine tuner.
+  // table_size :: Size of internal sin/cos tables, determines the resolution
+  //               of the frequency shift.
+  // freq_shift :: Frequency shift. Signal frequency will be shifted by
+  //               (sample_rate * freq_shift / table_size).
   FineTuner(unsigned int table_size, int freq_shift);
 
-  /** Process samples. */
+  // Process samples.
   void process(const IQSampleVector &samples_in, IQSampleVector &samples_out);
 
 private:
@@ -43,19 +39,16 @@ private:
   IQSampleVector m_table;
 };
 
-/** Low-pass filter for IQ samples, based on Lanczos FIR filter. */
+// Low-pass filter for IQ samples, based on Lanczos FIR filter.
 class LowPassFilterFirIQ {
 public:
-  /**
-   * Construct low-pass filter.
-   *
-   * filter_order :: FIR filter order.
-   * cutoff       :: Cutoff frequency relative to the full sample rate
-   *                 (valid range 0.0 ... 0.5).
-   */
+  // Construct low-pass filter.
+  // filter_order :: FIR filter order.
+  // cutoff       :: Cutoff frequency relative to the full sample rate
+  //                 (valid range 0.0 ... 0.5).
   LowPassFilterFirIQ(unsigned int filter_order, double cutoff);
 
-  /** Process samples. */
+  // Process samples.
   void process(const IQSampleVector &samples_in, IQSampleVector &samples_out);
 
 private:
@@ -63,30 +56,22 @@ private:
   IQSampleVector m_state;
 };
 
-/**
- *  Downsampler with low-pass FIR filter for real-valued signals.
- *
- *  Step 1: Low-pass filter based on Lanczos FIR filter
- *  Step 2: (optional) Decimation by an arbitrary factor (integer or float)
- */
+// Downsampler with low-pass FIR filter for real-valued signals.
+// Step 1: Low-pass filter based on Lanczos FIR filter
+// Step 2: (optional) Decimation by an arbitrary factor (integer or float)
 class DownsampleFilter {
 public:
-  /**
-   * Construct low-pass filter with optional downsampling.
-   *
-   * filter_order :: FIR filter order
-   * cutoff       :: Cutoff frequency relative to the full input sample rate
-   *                 (valid range 0.0 .. 0.5)
-   * downsample   :: Decimation factor (>= 1) or 1 to disable
-   * integer_factor :: Enables a faster and more precise algorithm that
-   *                   only works for integer downsample factors.
-   *
-   * The output sample rate is (input_sample_rate / downsample)
-   */
+  // Construct low-pass filter with optional downsampling.
+  // filter_order :: FIR filter order
+  // cutoff       :: Cutoff frequency relative to the full input sample rate
+  // downsample   :: Decimation factor (>= 1) or 1 to disable
+  // integer_factor :: Enables a faster and more precise algorithm that
+  //                   only works for integer downsample factors.
+  // The output sample rate is (input_sample_rate / downsample)
   DownsampleFilter(unsigned int filter_order, double cutoff,
                    double downsample = 1, bool integer_factor = true);
 
-  /** Process samples. */
+  // Process samples.
   void process(const SampleVector &samples_in, SampleVector &samples_out);
 
 private:
@@ -98,27 +83,24 @@ private:
   SampleVector m_state;
 };
 
-/** First order low-pass IIR filter for real-valued signals. */
+// First order low-pass IIR filter for real-valued signals.
 class LowPassFilterRC {
 public:
-  /**
-   * Construct 1st order low-pass IIR filter.
-   *
-   * timeconst :: RC time constant in seconds (1 / (2 * PI * cutoff_freq)
-   */
+  // Construct 1st order low-pass IIR filter.
+  // timeconst :: RC time constant in seconds (1 / (2 * PI * cutoff_freq)
   LowPassFilterRC(double timeconst);
 
-  /** Process samples. */
+  // Process samples.
   void process(const SampleVector &samples_in, SampleVector &samples_out);
 
-  /** Process samples in-place. */
+  // Process samples in-place.
   void process_inplace(SampleVector &samples);
 
-  /** Process interleaved samples. */
+  // Process interleaved samples.
   void process_interleaved(const SampleVector &samples_in,
                            SampleVector &samples_out);
 
-  /** Process interleaved samples in-place. */
+  // Process interleaved samples in-place.
   void process_interleaved_inplace(SampleVector &samples);
 
 private:
@@ -129,18 +111,15 @@ private:
   Sample m_y1_1;
 };
 
-/** Low-pass filter for real-valued signals based on Butterworth IIR filter. */
+// Low-pass filter for real-valued signals based on Butterworth IIR filter.
 class LowPassFilterIir {
 public:
-  /**
-   * Construct 4th order low-pass IIR filter.
-   *
-   * cutoff   :: Low-pass cutoff relative to the sample frequency
-   *             (valid range 0.0 .. 0.5, 0.5 = Nyquist)
-   */
+  // Construct 4th order low-pass IIR filter.
+  // cutoff   :: Low-pass cutoff relative to the sample frequency
+  //             (valid range 0.0 .. 0.5, 0.5 = Nyquist)
   LowPassFilterIir(double cutoff);
 
-  /** Process samples. */
+  // Process samples.
   void process(const SampleVector &samples_in, SampleVector &samples_out);
 
 private:
@@ -148,21 +127,18 @@ private:
   Sample y1, y2, y3, y4;
 };
 
-/** High-pass filter for real-valued signals based on Butterworth IIR filter. */
+// High-pass filter for real-valued signals based on Butterworth IIR filter.
 class HighPassFilterIir {
 public:
-  /**
-   * Construct 2nd order high-pass IIR filter.
-   *
-   * cutoff   :: High-pass cutoff relative to the sample frequency
-   *             (valid range 0.0 .. 0.5, 0.5 = Nyquist)
-   */
+  // Construct 2nd order high-pass IIR filter.
+  // cutoff   :: High-pass cutoff relative to the sample frequency
+  //             (valid range 0.0 .. 0.5, 0.5 = Nyquist)
   HighPassFilterIir(double cutoff);
 
-  /** Process samples. */
+  // Process samples.
   void process(const SampleVector &samples_in, SampleVector &samples_out);
 
-  /** Process samples in-place. */
+  // Process samples in-place.
   void process_inplace(SampleVector &samples);
 
 private:

@@ -38,16 +38,16 @@
 #include "SoftFM.h"
 #include "util.h"
 
-/** Flag is set on SIGINT / SIGTERM. */
+// Flag is set on SIGINT / SIGTERM.
 static std::atomic_bool stop_flag(false);
 
-/** Buffer to move sample data between threads. */
+// Buffer to move sample data between threads.
 template <class Element> class DataBuffer {
 public:
-  /** Constructor. */
+  // Constructor.
   DataBuffer() : m_qlen(0), m_end_marked(false) {}
 
-  /** Add samples to the queue. */
+  // Add samples to the queue.
   void push(std::vector<Element> &&samples) {
     if (!samples.empty()) {
       std::unique_lock<std::mutex> lock(m_mutex);
@@ -58,7 +58,7 @@ public:
     }
   }
 
-  /** Mark the end of the data stream. */
+  // Mark the end of the data stream.
   void push_end() {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_end_marked = true;
@@ -66,18 +66,16 @@ public:
     m_cond.notify_all();
   }
 
-  /** Return number of samples in queue. */
+  // Return number of samples in queue.
   size_t queued_samples() {
     std::unique_lock<std::mutex> lock(m_mutex);
     return m_qlen;
   }
 
-  /**
-   * If the queue is non-empty, remove a block from the queue and
-   * return the samples. If the end marker has been reached, return
-   * an empty vector. If the queue is empty, wait until more data is pushed
-   * or until the end marker is pushed.
-   */
+  // If the queue is non-empty, remove a block from the queue and
+  // return the samples. If the end marker has been reached, return
+  // an empty vector. If the queue is empty, wait until more data is pushed
+  // or until the end marker is pushed.
   std::vector<Element> pull() {
       std::vector<Element> ret;
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -91,13 +89,13 @@ public:
     return ret;
   }
 
-  /** Return true if the end has been reached at the Pull side. */
+  // Return true if the end has been reached at the Pull side.
   bool pull_end_reached() {
     std::unique_lock<std::mutex> lock(m_mutex);
     return m_qlen == 0 && m_end_marked;
   }
 
-  /** Wait until the buffer contains minfill samples or an end marker. */
+  // Wait until the buffer contains minfill samples or an end marker.
   void wait_buffer_fill(size_t minfill) {
     std::unique_lock<std::mutex> lock(m_mutex);
     while (m_qlen < minfill && !m_end_marked)
@@ -112,21 +110,18 @@ private:
   std::condition_variable m_cond;
 };
 
-/** Simple linear gain adjustment. */
+// Simple linear gain adjustment.
 void adjust_gain(SampleVector &samples, double gain) {
   for (unsigned int i = 0, n = samples.size(); i < n; i++) {
     samples[i] *= gain;
   }
 }
 
-/**
- * Read data from source device and put it in a buffer.
- *
- * This code runs in a separate thread.
- * The RTL-SDR library is not capable of buffering large amounts of data.
- * Running this in a background thread ensures that the time between calls
- * to RtlSdrSource::get_samples() is very short.
- */
+// Read data from source device and put it in a buffer.
+// This code runs in a separate thread.
+// The RTL-SDR library is not capable of buffering large amounts of data.
+// Running this in a background thread ensures that the time between calls
+// to RtlSdrSource::get_samples() is very short.
 void read_source_data(RtlSdrSource *rtlsdr, DataBuffer<IQSample> *buf) {
   IQSampleVector iqsamples;
 
@@ -143,11 +138,8 @@ void read_source_data(RtlSdrSource *rtlsdr, DataBuffer<IQSample> *buf) {
   buf->push_end();
 }
 
-/**
- * Get data from output buffer and write to output stream.
- *
- * This code runs in a separate thread.
- */
+// Get data from output buffer and write to output stream.
+// This code runs in a separate thread.
 void write_output_data(AudioOutput *output, DataBuffer<Sample> *buf,
                        unsigned int buf_minfill) {
   while (!stop_flag.load()) {
@@ -174,7 +166,7 @@ void write_output_data(AudioOutput *output, DataBuffer<Sample> *buf,
   }
 }
 
-/** Handle Ctrl-C and SIGTERM. */
+// Handle Ctrl-C and SIGTERM.
 static void handle_sigterm(int sig) {
   stop_flag.store(true);
 
@@ -231,7 +223,7 @@ bool parse_int(const char *s, int &v, bool allow_unit = false) {
   return true;
 }
 
-/** Return Unix time stamp in seconds. */
+// Return Unix time stamp in seconds.
 double get_time() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
@@ -643,4 +635,4 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-/* end */
+// end

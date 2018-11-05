@@ -10,7 +10,7 @@ typedef std::vector<IQSample> IQSampleVector;
 typedef double Sample;
 typedef std::vector<Sample> SampleVector;
 
-/** Compute mean and RMS over a sample vector. */
+// Compute mean and RMS over a sample vector.
 inline void samples_mean_rms(const SampleVector &samples, double &mean,
                              double &rms) {
   Sample vsum = 0;

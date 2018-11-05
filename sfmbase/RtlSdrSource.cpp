@@ -1,4 +1,3 @@
-
 #include <climits>
 #include <cstring>
 #include <rtl-sdr.h>
@@ -162,4 +161,4 @@ std::vector<std::string> RtlSdrSource::get_device_names() {
   return result;
 }
 
-/* end */
+// end
