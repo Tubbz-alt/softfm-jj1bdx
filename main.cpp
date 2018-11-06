@@ -34,6 +34,7 @@
 #include "AudioOutput.h"
 #include "DataBuffer.h"
 #include "FmDecode.h"
+#include "MovingAverage.h"
 #include "RtlSdrSource.h"
 #include "SoftFM.h"
 #include "util.h"

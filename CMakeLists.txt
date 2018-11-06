@@ -66,6 +66,7 @@ set(sfmbase_HEADERS
     include/DataBuffer.h
     include/Filter.h
     include/FmDecode.h
+    include/MovingAverage.h
     include/RtlSdrSource.h
     include/SoftFM.h
     include/util.h
