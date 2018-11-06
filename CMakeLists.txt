@@ -22,14 +22,14 @@ find_library(RTLSDR_LIBRARY librtlsdr.a
 # See https://github.com/texane/stlink/blob/master/cmake/modules/FindLibUSB.cmake
 pkg_check_modules(PKG_LIBUSB libusb-1.0)
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-	find_path(LIBUSB_INCLUDE_DIR libusb.h
+    find_path(LIBUSB_INCLUDE_DIR libusb.h
         HINTS /usr/include ${PKG_LIBUSB_INCLUDE_DIRS}
     )
 else ()
-	find_path(LIBUSB_INCLUDE_DIR libusb.h
+    find_path(LIBUSB_INCLUDE_DIR libusb.h
         HINTS /usr /usr/local /opt ${PKG_LIBUSB_INCLUDE_DIRS}
         PATH_SUFFIXES libusb-1.0
-	)
+    )
 endif()
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(LIBUSB_NAME usb)
@@ -62,35 +62,36 @@ set(sfmbase_SOURCES
 )
 
 set(sfmbase_HEADERS
-	include/AudioOutput.h
-	include/Filter.h
-	include/FmDecode.h
-	include/RtlSdrSource.h
-	include/SoftFM.h
-	include/util.h
+    include/AudioOutput.h
+    include/DataBuffer.h
+    include/Filter.h
+    include/FmDecode.h
+    include/RtlSdrSource.h
+    include/SoftFM.h
+    include/util.h
 )
 
 set(sfmbase_SOURCES
-	${sfmbase_SOURCES}
-	${sfmbase_HEADERS}
+    ${sfmbase_SOURCES}
+    ${sfmbase_HEADERS}
 )
 
 add_library(sfmbase STATIC
-	${sfmbase_SOURCES}
+    ${sfmbase_SOURCES}
 )
 
 add_executable(softfm
-	main.cpp
+    main.cpp
 )
 
 include_directories(
-	${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include
     ${RTLSDR_INCLUDE_DIRS}
     ${EXTRA_INCLUDES}
 )
 
 target_link_libraries(softfm
-	sfmbase
+    sfmbase
     ${CMAKE_THREAD_LIBS_INIT}
     ${RTLSDR_LIBRARIES}
     ${EXTRA_LIBS}
