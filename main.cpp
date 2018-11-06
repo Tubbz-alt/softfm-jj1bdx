@@ -308,8 +308,8 @@ int main(int argc, char **argv) {
             strerror(errno));
   }
 
-  // Intentionally tune at a higher frequency to avoid DC offset.
-  double tuner_freq = freq + 0.25 * ifrate;
+  // Initialize tuner frequency here
+  double tuner_freq = freq;
 
   // Open RTL-SDR device.
   RtlSdrSource rtlsdr(devidx);
