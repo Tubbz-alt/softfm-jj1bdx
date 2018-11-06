@@ -339,15 +339,16 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
 // Demodulate stereo L-R signal.
 void FmDecoder::demod_stereo(const SampleVector &samples_baseband,
                              SampleVector &samples_rawstereo) {
-  // Just multiply the baseband signal with the double-frequency pilot.
-  // And multiply by 1.17 to get the full amplitude.
-  // That's all.
+  // Multiply the baseband signal with the double-frequency pilot
+  // and multiply by 2.00 to get the full amplitude.
+  // TODO: F4EXB claims the multiplication constant
+  //       should be 1.17 instead of 2.00
 
   unsigned int n = samples_baseband.size();
   assert(n == samples_rawstereo.size());
 
   for (unsigned int i = 0; i < n; i++) {
-    samples_rawstereo[i] *= 1.17 * samples_baseband[i];
+    samples_rawstereo[i] *= 2.00 * samples_baseband[i];
   }
 }
 
