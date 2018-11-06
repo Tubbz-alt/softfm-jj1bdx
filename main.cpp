@@ -1,6 +1,8 @@
 // SoftFM - Software decoder for FM broadcast radio with RTL-SDR
 //
 // Copyright (C) 2013, Joris van Rantwijk.
+// Copyright (C) 2015 Edouard Griffiths, F4EXB
+// Copyright (C) 2018 Kenji Rikitake, JJ1BDX
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,15 +21,12 @@
 #include <atomic>
 #include <climits>
 #include <cmath>
-#include <condition_variable>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
 #include <memory>
-#include <mutex>
-#include <queue>
 #include <sys/time.h>
 #include <thread>
 #include <unistd.h>
@@ -107,7 +106,8 @@ static void handle_sigterm(int sig) {
   msg += ", stopping ...\n";
 
   const char *s = msg.c_str();
-  write(STDERR_FILENO, s, strlen(s));
+  ssize_t size = write(STDERR_FILENO, s, strlen(s));
+  size++; // dummy
 }
 
 void usage() {
