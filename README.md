@@ -10,18 +10,31 @@
 * Merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
 * Add quiet mode
 
-### macOS usage example (also works on Linux)
+### Usage example
 
-    ./softfm -f 88100000 -g 8.7 -b 1.0 -q -R - | \
-        play -t raw -esigned-integer -b16 -r 48000 -c 2 -q -
+   # normal sample rate
+   softfm -f 88100000 -g 8.7 -s 960000 -b 1.0 -R - | \
+          "play -t raw -esigned-integer -b16 -r 48000 -c 2 -
+   # lower sample rate for low performance hosts
+   softfm -f 88100000 -g 8.7 -s 240000 -r 44100 -b 2.0 -R - | \
+          "play -t raw -esigned-integer -b16 -r 44100 -c 2 -
 
-## Requirement
+## Tested hardware
+
+* All with RTL-SDR V3 dongle by rtl-sdr.com
+
+* Mac mini Late 2012 2.6GHz Intel Core i7 / macOS 10.14.1 (CPU time: ~12%)
+* Intel NUC DN2820FYK Celeron N2830 / Ubuntu 18.04 (CPU time: ~45%)
+* Raspberry Pi 2 Model B Rev 1.2 / Raspbian (240k samples/sec only) (CPU time: ~63%)
+
+## Software equirement
 
 * Linux or macOS (also buildable on FreeBSD)
 * C++11 (gcc and clang will do)
 * [RTL-SDR library](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
+* [sox](http://sox.sourceforge.net/)
 * Supported DVB-T receiver
-* Medium-fast computer (SoftFM takes 25% CPU time on my 1.6 GHz Core i3)
+* Medium-fast computer
 * Medium-strong FM radio signal
 
 ## Installation
