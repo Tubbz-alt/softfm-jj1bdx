@@ -26,10 +26,14 @@
 * Mac mini Late 2012 2.6GHz Intel Core i7 / macOS 10.14.1 (CPU time: ~12%)
 * Intel NUC DN2820FYK Celeron N2830 / Ubuntu 18.04 (CPU time: ~45%)
 * Raspberry Pi 2 Model B Rev 1.2 / Raspbian (240k samples/sec only) (CPU time: ~63%)
+* Intel NUC D54327RK i5-3427U / FreeBSD 11.2-STABLE (CPU time: ~21%)
+
+* Mac mini: Roland UA-M10
+* Other machines: C-Media Electronics (generic USB Audio device with headphone output and mic input)
 
 ## Software equirement
 
-* Linux or macOS (also buildable on FreeBSD)
+* Linux / macOS / FreeBSD
 * C++11 (gcc and clang will do)
 * [RTL-SDR library](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
 * [sox](http://sox.sourceforge.net/)
