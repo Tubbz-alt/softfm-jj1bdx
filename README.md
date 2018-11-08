@@ -12,11 +12,11 @@
 
 ### Usage example
 
-   # normal sample rate
-   softfm -f 88100000 -g 8.7 -s 960000 -b 1.0 -R - | \
+       # normal sample rate
+       softfm -f 88100000 -g 8.7 -s 960000 -b 1.0 -R - | \
           "play -t raw -esigned-integer -b16 -r 48000 -c 2 -
-   # lower sample rate for low performance hosts
-   softfm -f 88100000 -g 8.7 -s 240000 -r 44100 -b 2.0 -R - | \
+       # lower sample rate for low performance hosts
+       softfm -f 88100000 -g 8.7 -s 240000 -r 44100 -b 2.0 -R - | \
           "play -t raw -esigned-integer -b16 -r 44100 -c 2 -
 
 ## Tested hardware
