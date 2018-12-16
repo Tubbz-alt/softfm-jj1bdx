@@ -9,6 +9,7 @@
 * Fix other glitches on macOS
 * Merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
 * Add quiet mode
+* Add option `-X` for [Quadratic Multipath Monitor (QMM)](http://ham-radio.com/k6sti/qmm.htm)
 
 ### Usage example
 
@@ -27,7 +28,7 @@
 
 ### Computers
 
-* Mac mini Late 2012 2.6GHz Intel Core i7 / macOS 10.14.1 (CPU time: ~12%)
+* Mac mini 2018 3.2GHz Intel Core i7 / macOS 10.14.2 (CPU time: ~9%)
 * Intel NUC DN2820FYK Celeron N2830 / Ubuntu 18.04 (CPU time: ~45%)
 * Raspberry Pi 2 Model B Rev 1.2 / Raspbian (240k samples/sec only) (CPU time: ~63%)
 * Intel NUC D54327RK i5-3427U / FreeBSD 11.2-STABLE (CPU time: ~21%)
@@ -45,7 +46,7 @@
 * [sox](http://sox.sourceforge.net/)
 * Supported DVB-T receiver
 * Medium-fast computer
-* Medium-strong FM radio signal
+* Medium-strength FM radio signal
 
 ## Installation
 
