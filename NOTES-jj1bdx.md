@@ -28,6 +28,6 @@ The QMM output has the following characteristics: (quote from the Brian's page)
 
 > For a perfectly transmitted and received signal, you'll get no output. For a real signal you may hear L+R harmonics, phase-rotated L−R intermodulation products, or crossmodulation between L+R, L−R, SCA, RDS, or HD Radio sidebands. Multipath propagation can cause any of these artifacts. You may also hear co-channel interference, adjacent-channel interference, HD Radio self-noise, or background noise.
 
-I've implemented the QMM function as `-X` option, and with the variable `pilot_shift`. This option shifts the phase of regenerated subcarrier for decoding the L-R DSB signal from the original `sin(2\*x)` (where x represents the 19kHz pilot frequency) to `cos(2\*x)`.
+I've implemented the QMM function as `-X` option, and with the variable `pilot_shift`. This option shifts the phase of regenerated subcarrier for decoding the L-R DSB signal from the original `sin(2*x)` (where x represents the 19kHz pilot frequency) to `cos(2*x)`.
 
 [More to go]
