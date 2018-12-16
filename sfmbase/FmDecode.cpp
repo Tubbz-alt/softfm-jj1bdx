@@ -280,7 +280,7 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
 
   // Measure IF level.
   double if_rms = rms_level_approx(m_buf_iffiltered);
-  m_if_level = 0.95 * m_if_level + 0.05 * if_rms;
+  m_if_level = if_rms;
 
   // Extract carrier frequency.
   m_phasedisc.process(m_buf_iffiltered, m_buf_baseband);
@@ -343,8 +343,8 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
 
     // Mono deemphasis
     m_deemph_mono.process_inplace(m_buf_mono);
-    // Just return mono channel.
-    audio = move(m_buf_mono);
+    // Duplicate mono signal in left/right channels.
+    mono_to_left_right(m_buf_mono, audio);
   }
 }
 

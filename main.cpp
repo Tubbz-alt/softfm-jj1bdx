@@ -180,6 +180,8 @@ int main(int argc, char **argv) {
   FILE *ppsfile = NULL;
   double bufsecs = -1;
   bool pilot_shift = false;
+  double if_level_max = 0;
+  double if_level_min = 10;
 
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
@@ -494,23 +496,31 @@ int main(int argc, char **argv) {
     // Decode FM signal.
     fm.process(iqsamples, audiosamples);
 
-    // Measure audio level.
-    double audio_mean, audio_rms;
-    samples_mean_rms(audiosamples, audio_mean, audio_rms);
-    audio_level = 0.95 * audio_level + 0.05 * audio_rms;
-
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
 
     // Show statistics.
 
     if (!quietmode) {
+      // Estimate D/U ratio.
+      double if_level = fm.get_if_level();
+      if_level_max = std::max(if_level_max, if_level);
+      if_level_min = std::min(if_level_min, if_level);
+      double ratio = if_level_max / if_level_min;
+      double du_ratio = (ratio + 1) / (ratio - 1);
+
+      // Measure audio level.
+      double audio_mean, audio_rms;
+      samples_mean_rms(audiosamples, audio_mean, audio_rms);
+      audio_level = 0.95 * audio_level + 0.05 * audio_rms;
+
       fprintf(
           stderr,
           // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
-          "\rblk=%6d:f=%8.4fMHz:IF=%+5.1fdB:BB=%+5.1fdB:audio=%+5.1fdB:perr=%7.4f",
+          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdB:DU=%6.2fdB:BB=%+6.2fdB:audio=%+6.2fdB:perr=%7.4f",
           block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
-          20 * log10(fm.get_if_level()),
+          20 * log10(if_level),
+          20 * log10(du_ratio),
           20 * log10(fm.get_baseband_level()) + 3.01,
           20 * log10(audio_level) + 3.01,
           fm.get_phase_error());
