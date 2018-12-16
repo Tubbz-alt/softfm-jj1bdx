@@ -104,7 +104,8 @@ PilotPhaseLock::PilotPhaseLock(double freq, double bandwidth,
 
 // Process samples.
 void PilotPhaseLock::process(const SampleVector &samples_in,
-                             SampleVector &samples_out) {
+                             SampleVector &samples_out,
+                             bool pilot_shift) {
   unsigned int n = samples_in.size();
 
   samples_out.resize(n);
@@ -122,8 +123,15 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
     Sample pcos = cos(m_phase);
 
     // Generate double-frequency output.
-    // sin(2*x) = 2 * sin(x) * cos(x)
-    samples_out[i] = 2 * psin * pcos;
+    if (pilot_shift) {
+      // Use cos(2*x) to shift phase for pi/4 (90 degrees)
+      // cos(2*x) = 2 * cos(x) * cos(x) - 1
+      samples_out[i] = 2 * pcos * pcos - 1;
+    } else {
+      // Proper phase: not shifted
+      // sin(2*x) = 2 * sin(x) * cos(x)
+      samples_out[i] = 2 * psin * pcos;
+    }
 
     // Multiply locked tone with input.
     Sample x = samples_in[i];
@@ -199,7 +207,7 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
 FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
                      double sample_rate_pcm, bool stereo, double deemphasis,
                      double bandwidth_if, double freq_dev, double bandwidth_pcm,
-                     unsigned int downsample)
+                     unsigned int downsample, bool pilot_shift)
 
     // Initialize member fields
     : m_sample_rate_if(sample_rate_if),
@@ -207,6 +215,7 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
       m_tuning_table_size(64),
       m_tuning_shift(lrint(-64.0 * tuning_offset / sample_rate_if)),
       m_freq_dev(freq_dev), m_downsample(downsample), m_stereo_enabled(stereo),
+      m_pilot_shift(pilot_shift),
       m_stereo_detected(false), m_if_level(0), m_baseband_mean(0),
       m_baseband_level(0)
 
@@ -297,7 +306,7 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   if (m_stereo_enabled) {
 
     // Lock on stereo pilot.
-    m_pilotpll.process(m_buf_baseband, m_buf_rawstereo);
+    m_pilotpll.process(m_buf_baseband, m_buf_rawstereo, m_pilot_shift);
     m_stereo_detected = m_pilotpll.locked();
 
     // Demodulate stereo signal.
@@ -313,12 +322,15 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
     m_dcblock_stereo.process_inplace(m_buf_stereo);
 
     if (m_stereo_detected) {
-
-      // Extract left/right channels from (L+R) / (L-R) signals.
-      stereo_to_left_right(m_buf_mono, m_buf_stereo, audio);
+      if (m_pilot_shift) {
+        // Duplicate L-R shifted output in left/right channels.
+        mono_to_left_right(m_buf_stereo, audio);
+      } else {
+        // Extract left/right channels from (L+R) / (L-R) signals.
+        stereo_to_left_right(m_buf_mono, m_buf_stereo, audio);
+      }
       // Stereo deemphasis to L and R
       m_deemph_stereo.process_inplace(audio);
-
     } else {
 
       // Mono deemphasis

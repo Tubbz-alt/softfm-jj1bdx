@@ -132,6 +132,7 @@ void usage() {
       "                use filename '-' to write to stdout\n"
       "  -b seconds    Set audio buffer size in seconds\n"
       "  -q            Set quiet mode\n"
+      "  -X            Shift pilot phase (for Quadrature Multipath Monitor)\n"
       "\n");
 }
 
@@ -178,6 +179,7 @@ int main(int argc, char **argv) {
   std::string ppsfilename;
   FILE *ppsfile = NULL;
   double bufsecs = -1;
+  bool pilot_shift = false;
 
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
@@ -189,10 +191,11 @@ int main(int argc, char **argv) {
       {"mono", 0, NULL, 'M'},    {"raw", 1, NULL, 'R'},
       {"wav", 1, NULL, 'W'},     {"play", 2, NULL, 'P'},
       {"pps", 1, NULL, 'T'},     {"buffer", 1, NULL, 'b'},
-      {"quiet", 1, NULL, 'q'},   {NULL, 0, NULL, 0}};
+      {"quiet", 1, NULL, 'q'},   {"pilotshift", 0, NULL, 'X'},
+      {NULL, 0, NULL, 0}};
 
   int c, longindex;
-  while ((c = getopt_long(argc, argv, "f:d:g:s:r:MR:W:P::T:b:aq", longopts,
+  while ((c = getopt_long(argc, argv, "f:d:g:s:r:MR:W:P::T:b:aqX", longopts,
                           &longindex)) >= 0) {
     switch (c) {
     case 'f':
@@ -258,6 +261,9 @@ int main(int argc, char **argv) {
       break;
     case 'q':
       quietmode = true;
+      break;
+    case 'X':
+      pilot_shift = true;
       break;
     default:
       usage();
@@ -389,7 +395,8 @@ int main(int argc, char **argv) {
                FmDecoder::default_bandwidth_if, // bandwidth_if
                FmDecoder::default_freq_dev,     // freq_dev
                bandwidth_pcm,                   // bandwidth_pcm
-               downsample);                     // downsample
+               downsample,                      // downsample
+               pilot_shift);                    // pilot_shift
 
   // Calculate number of samples in audio buffer.
   unsigned int outputbuf_samples = 0;
@@ -500,15 +507,17 @@ int main(int argc, char **argv) {
     if (!quietmode) {
       fprintf(
           stderr,
-          "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
+          // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
+          "\rblk=%6d:f=%8.4fMHz:IF=%+5.1fdB:BB=%+5.1fdB:audio=%+5.1fdB:perr=%7.4f",
           block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
           20 * log10(fm.get_if_level()),
           20 * log10(fm.get_baseband_level()) + 3.01,
-          20 * log10(audio_level) + 3.01);
+          20 * log10(audio_level) + 3.01,
+          fm.get_phase_error());
       if (outputbuf_samples > 0) {
         unsigned int nchannel = stereo ? 2 : 1;
         size_t buflen = output_buffer.queued_samples();
-        fprintf(stderr, " buf=%.1fs ", buflen / nchannel / double(pcmrate));
+        fprintf(stderr, ":buf=%.1fs ", buflen / nchannel / double(pcmrate));
       }
       fflush(stderr);
     }

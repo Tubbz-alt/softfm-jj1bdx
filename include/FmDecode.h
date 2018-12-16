@@ -40,15 +40,19 @@ public:
   };
 
   // Construct phase-locked loop.
-  // freq       :: 19 kHz center frequency relative to sample freq
-  //               (0.5 is Nyquist)
-  // bandwidth  :: bandwidth relative to sample frequency
-  // minsignal  :: minimum pilot amplitude
+  // freq        :: 19 kHz center frequency relative to sample freq
+  //                (0.5 is Nyquist)
+  // bandwidth   :: bandwidth relative to sample frequency
+  // minsignal   :: minimum pilot amplitude
   PilotPhaseLock(double freq, double bandwidth, double minsignal);
 
   // Process samples and extract 19 kHz pilot tone.
   // Generate phase-locked 38 kHz tone with unit amplitude.
-  void process(const SampleVector &samples_in, SampleVector &samples_out);
+  // pilot_shift :: true to shift pilot phase
+  //             :: (use cos(2*x) instead of sin (2*x))
+  //             :: (for multipath distortion detection)
+  void process(const SampleVector &samples_in, SampleVector &samples_out,
+          bool pilot_shift);
 
   // Return true if the phase-locked loop is locked.
   bool locked() const { return m_lock_cnt >= m_lock_delay; }
@@ -58,6 +62,9 @@ public:
 
   // Return PPS events from the most recently processed block.
   std::vector<PpsEvent> get_pps_events() const { return m_pps_events; }
+
+  // Return detected phase error of pilot signal.
+  double get_phase_error() const { return m_loopfilter_x1; }
 
 private:
   Sample m_minfreq, m_maxfreq;
@@ -102,12 +109,16 @@ public:
   //                     (15 kHz for broadcast FM)
   // downsample       :: Downsampling factor to apply after FM demodulation.
   //                     Set to 1 to disable.
+  // pilot_shift      :: True to shift pilot signal phase
+  //                  :: (use cos(2*x) instead of sin (2*x))
+  //                  :: (for multipath distortion detection)
   FmDecoder(double sample_rate_if, double tuning_offset, double sample_rate_pcm,
             bool stereo = true, double deemphasis = 50,
             double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,
             double bandwidth_pcm = default_bandwidth_pcm,
-            unsigned int downsample = 1);
+            unsigned int downsample = 1,
+            bool pilot_shift = false);
 
   // Process IQ samples and return audio samples.
   //
@@ -136,6 +147,9 @@ public:
   // Return amplitude of stereo pilot (nominal level is 0.1).
   double get_pilot_level() const { return m_pilotpll.get_pilot_level(); }
 
+  // Return detected phase error of stereo pilot signal.
+  double get_phase_error() const { return m_pilotpll.get_phase_error(); }
+
   // Return PPS events from the most recently processed block.
   std::vector<PilotPhaseLock::PpsEvent> get_pps_events() const {
     return m_pilotpll.get_pps_events();
@@ -163,6 +177,7 @@ private:
   const double m_freq_dev;
   const unsigned int m_downsample;
   const bool m_stereo_enabled;
+  const bool m_pilot_shift;
   bool m_stereo_detected;
   double m_if_level;
   double m_baseband_mean;
