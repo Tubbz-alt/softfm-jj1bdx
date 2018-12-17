@@ -521,7 +521,7 @@ int main(int argc, char **argv) {
       fprintf(
           stderr,
           // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
-          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdB:DU=%6.2fdB:BB=%+6.2fdB:audio=%+6.2fdB:perr=%7.4f",
+          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB:audio=%+5.1fdB:perr=%+6.4f",
           block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
           20 * log10(if_level),
           20 * log10(du_ratio),
