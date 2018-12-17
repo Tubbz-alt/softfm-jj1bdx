@@ -496,23 +496,27 @@ int main(int argc, char **argv) {
     // Decode FM signal.
     fm.process(iqsamples, audiosamples);
 
+    // Measure audio level.
+    double audio_mean, audio_rms;
+    samples_mean_rms(audiosamples, audio_mean, audio_rms);
+    audio_level = 0.95 * audio_level + 0.05 * audio_rms;
+
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
 
     // Show statistics.
 
     if (!quietmode) {
-      // Estimate D/U ratio.
+
+      // Estimate D/U ratio, skip first 10 blocks.
       double if_level = fm.get_if_level();
+      double du_ratio = 2;
       if_level_max = std::max(if_level_max, if_level);
       if_level_min = std::min(if_level_min, if_level);
-      double ratio = if_level_max / if_level_min;
-      double du_ratio = (ratio + 1) / (ratio - 1);
-
-      // Measure audio level.
-      double audio_mean, audio_rms;
-      samples_mean_rms(audiosamples, audio_mean, audio_rms);
-      audio_level = 0.95 * audio_level + 0.05 * audio_rms;
+      if (block > 10) {
+        double ratio = if_level_max / if_level_min;
+        du_ratio = (ratio + 1) / (ratio - 1);
+      }
 
       fprintf(
           stderr,
