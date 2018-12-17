@@ -8,8 +8,9 @@
 * Remove ALSA dependency to make this software run on macOS
 * Fix other glitches on macOS
 * Merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
-* Add quiet mode
+* Add quiet mode `-q`
 * Add option `-X` for [Quadratic Multipath Monitor (QMM)](http://ham-radio.com/k6sti/qmm.htm)
+* Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling speed (>900000 samples/sec))
 
 ### Usage example
 
