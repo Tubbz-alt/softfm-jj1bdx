@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
   int devidx = 0;
   int lnagain = INT_MIN;
   bool agcmode = false;
-  double ifrate = 1.0e6;
+  double ifrate = 960000;
   int pcmrate = 48000;
   bool stereo = true;
   enum OutputMode { MODE_RAW, MODE_WAV };
