@@ -11,6 +11,7 @@
 * Add quiet mode `-q`
 * Add option `-X` for [Quadratic Multipath Monitor (QMM)](http://ham-radio.com/k6sti/qmm.htm)
 * Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling speed (>900000 samples/sec))
+* Set default bandwidth to 240kHz (+-120kHz)
 
 ### Usage example
 
