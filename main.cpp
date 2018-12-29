@@ -504,8 +504,31 @@ int main(int argc, char **argv) {
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
 
-    // Show statistics.
+    // Write PPS markers.
+    if (ppsfile != NULL) {
+      for (const PilotPhaseLock::PpsEvent &ev : fm.get_pps_events()) {
+        double ts = prev_block_time;
+        ts += ev.block_position * (block_time - prev_block_time);
+        fprintf(ppsfile, "%8s %14s %18.6f\n",
+                std::to_string(ev.pps_index).c_str(),
+                std::to_string(ev.sample_index).c_str(), ts);
+        fflush(ppsfile);
+      }
+    }
 
+    // Throw away first block. It is noisy because IF filters
+    // are still starting up.
+    if (block > 0) {
+      if (outputbuf_samples > 0) {
+        // Buffered write.
+        output_buffer.push(move(audiosamples));
+      } else {
+        // Direct write.
+        audio_output->write(audiosamples);
+      }
+    }
+
+    // Show statistics.
     if (!quietmode) {
 
       // Estimate D/U ratio, skip first 10 blocks.
@@ -534,12 +557,10 @@ int main(int argc, char **argv) {
         fprintf(stderr, ":buf=%.1fs ", buflen / nchannel / double(pcmrate));
       }
       fflush(stderr);
-    }
 
-    // Show stereo status.
-    if (fm.stereo_detected() != got_stereo) {
-      got_stereo = fm.stereo_detected();
-      if (!quietmode) {
+      // Show stereo status.
+      if (fm.stereo_detected() != got_stereo) {
+        got_stereo = fm.stereo_detected();
         if (got_stereo) {
           fprintf(stderr, "\ngot stereo signal (pilot level = %f)\n",
                   fm.get_pilot_level());
@@ -549,35 +570,6 @@ int main(int argc, char **argv) {
       }
     }
 
-    // Write PPS markers.
-    if (ppsfile != NULL) {
-      for (const PilotPhaseLock::PpsEvent &ev : fm.get_pps_events()) {
-        double ts = prev_block_time;
-        ts += ev.block_position * (block_time - prev_block_time);
-        fprintf(ppsfile, "%8s %14s %18.6f\n",
-                std::to_string(ev.pps_index).c_str(),
-                std::to_string(ev.sample_index).c_str(), ts);
-        fflush(ppsfile);
-      }
-    }
-
-    // Throw away first block. It is noisy because IF filters
-    // are still starting up.
-    if (block > 0) {
-
-      // Write samples to output.
-      if (outputbuf_samples > 0) {
-        // Buffered write.
-        output_buffer.push(move(audiosamples));
-      } else {
-        // Direct write.
-        audio_output->write(audiosamples);
-      }
-    }
-  }
-
-  if (!quietmode) {
-    fprintf(stderr, "\n");
   }
 
   // Join background threads.
