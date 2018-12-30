@@ -120,7 +120,7 @@ void usage() {
       "(default 0)\n"
       "  -g gain       Set LNA gain in dB, or 'auto' (default auto)\n"
       "  -a            Enable RTL AGC mode (default disabled)\n"
-      "  -s ifrate     IF sample rate in Hz (default 1200000)\n"
+      "  -s ifrate     IF sample rate in Hz (default 960000)\n"
       "                (valid ranges: [225001, 300000], [900001, 3200000]))\n"
       "  -r pcmrate    Audio sample rate in Hz (default 48000 Hz)\n"
       "  -M            Disable stereo decoding (output in stereo)\n"
