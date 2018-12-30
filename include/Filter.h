@@ -65,18 +65,15 @@ public:
   // filter_order :: FIR filter order
   // cutoff       :: Cutoff frequency relative to the full input sample rate
   // downsample   :: Decimation factor (>= 1) or 1 to disable
-  // integer_factor :: Enables a faster and more precise algorithm that
-  //                   only works for integer downsample factors.
   // The output sample rate is (input_sample_rate / downsample)
   DownsampleFilter(unsigned int filter_order, double cutoff,
-                   double downsample = 1, bool integer_factor = true);
+                   double downsample = 1.0);
 
   // Process samples.
   void process(const SampleVector &samples_in, SampleVector &samples_out);
 
 private:
   double m_downsample;
-  unsigned int m_downsample_int;
   unsigned int m_pos_int;
   Sample m_pos_frac;
   SampleVector m_coeff;

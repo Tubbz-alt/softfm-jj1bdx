@@ -148,9 +148,8 @@ void LowPassFilterFirIQ::process(const IQSampleVector &samples_in,
 
 // Construct low-pass filter with optional downsampling.
 DownsampleFilter::DownsampleFilter(unsigned int filter_order, double cutoff,
-                                   double downsample, bool integer_factor)
+                                   double downsample)
     : m_downsample(downsample),
-      m_downsample_int(integer_factor ? lrint(downsample) : 0), m_pos_int(0),
       m_pos_frac(0), m_state(filter_order) {
   assert(downsample >= 1);
   assert(filter_order > 1);
@@ -170,19 +169,15 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   unsigned int n = samples_in.size();
 
   // Use integer downsample factor algorithm
-  // if the downsample factor is really an integer
-  // even if m_downsample_int equals to zero.
-  if (ceilf(m_downsample) == (m_downsample)) {
-    m_downsample_int = int(m_downsample);
-  }
+  // if the downsample factor is really an integer.
 
-  if (m_downsample_int != 0) {
+  if (ceilf(m_downsample) == (m_downsample)) {
 
     // Integer downsample factor, no linear interpolation.
     // This is relatively simple.
 
     unsigned int p = m_pos_int;
-    unsigned int pstep = m_downsample_int;
+    unsigned int pstep = lrint(m_downsample);
 
     samples_out.resize((n - p + pstep - 1) / pstep);
 
