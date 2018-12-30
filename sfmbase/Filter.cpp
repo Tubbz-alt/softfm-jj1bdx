@@ -169,6 +169,13 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   unsigned int order = m_state.size();
   unsigned int n = samples_in.size();
 
+  // Use integer downsample factor algorithm
+  // if the downsample factor is really an integer
+  // even if m_downsample_int equals to zero.
+  if (ceilf(m_downsample) == (m_downsample)) {
+    m_downsample_int = int(m_downsample);
+  }
+
   if (m_downsample_int != 0) {
 
     // Integer downsample factor, no linear interpolation.
