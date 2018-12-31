@@ -209,7 +209,7 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   } else {
 
     // Fractional downsample factor via linear interpolation of
-    // the FIR coefficient table. This is a bitch.
+    // the FIR coefficient table. This is complicated.
 
     // Estimate number of output samples we can produce in this run.
     Sample p = m_pos_frac;
