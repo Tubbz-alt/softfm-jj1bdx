@@ -102,8 +102,9 @@ PilotPhaseLock::PilotPhaseLock(double freq, double bandwidth,
   m_sample_cnt = 0;
 }
 
-// Process samples.
-void PilotPhaseLock::process(const SampleVector &samples_in,
+// Process samples and generate the 38kHz locked tone;
+// remove remained locked 19kHz tone from samples_in if locked.
+void PilotPhaseLock::process(SampleVector &samples_in,
                              SampleVector &samples_out,
                              bool pilot_shift) {
   unsigned int n = samples_in.size();
@@ -181,6 +182,12 @@ void PilotPhaseLock::process(const SampleVector &samples_in,
         }
       }
     }
+
+    // Remove detected 19kHz tone from samples_in if locked.
+    if (was_locked) {
+      samples_in[i] -= psin * m_pilot_level * 2.0;
+    }
+
   }
 
   // Update lock status.
@@ -294,6 +301,13 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   m_baseband_mean = 0.95 * m_baseband_mean + 0.05 * baseband_mean;
   m_baseband_level = 0.95 * m_baseband_level + 0.05 * baseband_rms;
 
+  if (m_stereo_enabled) {
+    // Lock on stereo pilot,
+    // and remove locked 19kHz tone from the composite signal.
+    m_pilotpll.process(m_buf_baseband, m_buf_rawstereo, m_pilot_shift);
+    m_stereo_detected = m_pilotpll.locked();
+  }
+
   // Extract mono audio signal.
   m_resample_mono.process(m_buf_baseband, m_buf_mono);
 
@@ -301,11 +315,6 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   m_dcblock_mono.process_inplace(m_buf_mono);
 
   if (m_stereo_enabled) {
-
-    // Lock on stereo pilot.
-    m_pilotpll.process(m_buf_baseband, m_buf_rawstereo, m_pilot_shift);
-    m_stereo_detected = m_pilotpll.locked();
-
     // Demodulate stereo signal.
     demod_stereo(m_buf_baseband, m_buf_rawstereo);
 
