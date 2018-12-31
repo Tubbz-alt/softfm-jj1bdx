@@ -74,6 +74,7 @@ public:
 
 private:
   double m_downsample;
+  bool m_downsample_int;
   unsigned int m_pos_int;
   Sample m_pos_frac;
   SampleVector m_coeff;

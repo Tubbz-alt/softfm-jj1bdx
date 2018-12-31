@@ -150,6 +150,7 @@ void LowPassFilterFirIQ::process(const IQSampleVector &samples_in,
 DownsampleFilter::DownsampleFilter(unsigned int filter_order, double cutoff,
                                    double downsample)
     : m_downsample(downsample),
+      m_downsample_int(ceilf(m_downsample) == (m_downsample)),
       m_pos_frac(0), m_state(filter_order) {
   assert(downsample >= 1);
   assert(filter_order > 1);
@@ -171,7 +172,7 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   // Use integer downsample factor algorithm
   // if the downsample factor is really an integer.
 
-  if (ceilf(m_downsample) == (m_downsample)) {
+  if (m_downsample_int) {
 
     // Integer downsample factor, no linear interpolation.
     // This is relatively simple.
