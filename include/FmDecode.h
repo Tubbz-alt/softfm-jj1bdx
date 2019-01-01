@@ -93,12 +93,12 @@ public:
   static constexpr double pilot_freq = 19000;
 
   // Construct FM decoder.
+  // Stereo decoding always enabled.
   // sample_rate_if   :: IQ sample rate in Hz.
   // tuning_offset    :: Frequency offset in Hz of radio station with respect
   //                     to receiver LO frequency (positive value means
   //                     station is at higher frequency than LO).
   // sample_rate_pcm  :: Audio sample rate.
-  // stereo           :: True to enable stereo decoding.
   // deemphasis       :: Time constant of de-emphasis filter in microseconds
   //                     (50 us for broadcast FM, 0 to disable de-emphasis).
   // bandwidth_if     :: Half bandwidth of IF signal in Hz
@@ -112,8 +112,8 @@ public:
   // pilot_shift      :: True to shift pilot signal phase
   //                  :: (use cos(2*x) instead of sin (2*x))
   //                  :: (for multipath distortion detection)
-  FmDecoder(double sample_rate_if, double tuning_offset, double sample_rate_pcm,
-            bool stereo = true, double deemphasis = 50,
+  FmDecoder(double sample_rate_if, double tuning_offset,
+            double sample_rate_pcm, double deemphasis = 50,
             double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,
             double bandwidth_pcm = default_bandwidth_pcm,

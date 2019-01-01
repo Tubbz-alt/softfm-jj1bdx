@@ -170,7 +170,6 @@ int main(int argc, char **argv) {
   bool agcmode = false;
   double ifrate = 960000;
   int pcmrate = 48000;
-  bool stereo = true;
   enum OutputMode { MODE_RAW, MODE_WAV };
   OutputMode outmode = MODE_RAW;
   bool quietmode = false;
@@ -388,7 +387,6 @@ int main(int argc, char **argv) {
   FmDecoder fm(ifrate,                          // sample_rate_if
                freq - tuner_freq,               // tuning_offset
                pcmrate,                         // sample_rate_pcm
-               stereo,                          // stereo
                FmDecoder::default_deemphasis,   // deemphasis,
                FmDecoder::default_bandwidth_if, // bandwidth_if
                FmDecoder::default_freq_dev,     // freq_dev
@@ -447,7 +445,7 @@ int main(int argc, char **argv) {
     if (!quietmode) {
       fprintf(stderr, "writing audio samples to '%s'\n", filename.c_str());
     }
-    audio_output.reset(new WavAudioOutput(filename, pcmrate, stereo));
+    audio_output.reset(new WavAudioOutput(filename, pcmrate));
     break;
   }
 

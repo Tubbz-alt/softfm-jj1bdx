@@ -115,8 +115,8 @@ bool RawAudioOutput::write(const SampleVector &samples) {
 
 // Construct .WAV writer.
 WavAudioOutput::WavAudioOutput(const std::string &filename,
-                               unsigned int samplerate, bool stereo)
-    : numberOfChannels(stereo ? 2 : 1), sampleRate(samplerate) {
+                               unsigned int samplerate)
+    : numberOfChannels(2), sampleRate(samplerate) {
   m_stream = fopen(filename.c_str(), "wb");
   if (m_stream == NULL) {
     m_error = "can not open '" + filename + "' (" + strerror(errno) + ")";

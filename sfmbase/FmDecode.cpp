@@ -212,7 +212,7 @@ void PilotPhaseLock::process(SampleVector &samples_in,
 // class FmDecoder
 
 FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
-                     double sample_rate_pcm, bool stereo, double deemphasis,
+                     double sample_rate_pcm, double deemphasis,
                      double bandwidth_if, double freq_dev, double bandwidth_pcm,
                      unsigned int downsample, bool pilot_shift)
 
@@ -221,7 +221,7 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
       m_sample_rate_baseband(sample_rate_if / downsample),
       m_tuning_table_size(64),
       m_tuning_shift(lrint(-64.0 * tuning_offset / sample_rate_if)),
-      m_freq_dev(freq_dev), m_downsample(downsample), m_stereo_enabled(stereo),
+      m_freq_dev(freq_dev), m_downsample(downsample), m_stereo_enabled(true),
       m_pilot_shift(pilot_shift),
       m_stereo_detected(false), m_if_level(0), m_baseband_mean(0),
       m_baseband_level(0)

@@ -64,11 +64,10 @@ private:
 class WavAudioOutput : public AudioOutput {
 public:
   // Construct .WAV writer.
+  // Stereo output always.
   // filename     :: file name (including path) or "-" to write to stdout
   // samplerate   :: audio sample rate in Hz
-  // stereo       :: true if the output stream contains stereo data
-  WavAudioOutput(const std::string &filename, unsigned int samplerate,
-                 bool stereo);
+  WavAudioOutput(const std::string &filename, unsigned int samplerate);
 
   ~WavAudioOutput();
   bool write(const SampleVector &samples);
