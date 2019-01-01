@@ -464,7 +464,7 @@ int main(int argc, char **argv) {
   DataBuffer<Sample> output_buffer;
   std::thread output_thread;
   if (outputbuf_samples > 0) {
-    unsigned int nchannel = stereo ? 2 : 1;
+    const unsigned int nchannel = 2;
     output_thread = std::thread(write_output_data, audio_output.get(),
                                 &output_buffer, outputbuf_samples * nchannel);
   }
@@ -552,7 +552,7 @@ int main(int argc, char **argv) {
           20 * log10(audio_level) + 3.01,
           fm.get_phase_error());
       if (outputbuf_samples > 0) {
-        unsigned int nchannel = stereo ? 2 : 1;
+        const unsigned int nchannel = 2;
         size_t buflen = output_buffer.queued_samples();
         fprintf(stderr, ":buf=%.1fs ", buflen / nchannel / double(pcmrate));
       }
