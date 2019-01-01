@@ -334,10 +334,15 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
     // Stereo deemphasis to L and R
     m_deemph_stereo.process_inplace(audio);
   } else {
+    if (m_pilot_shift) {
+      // Duplicate L-R shifted output in left/right channels.
+      zero_to_left_right(m_buf_stereo, audio);
+    } else {
     // Mono deemphasis
     m_deemph_mono.process_inplace(m_buf_mono);
     // Duplicate mono signal in left/right channels.
     mono_to_left_right(m_buf_mono, audio);
+    }
   }
 }
 
@@ -383,6 +388,19 @@ void FmDecoder::stereo_to_left_right(const SampleVector &samples_mono,
     Sample s = samples_stereo[i];
     audio[2 * i] = m + s;
     audio[2 * i + 1] = m - s;
+  }
+}
+
+// Fill zero signal in left/right channels.
+// (samples_mono used for the size determination only)
+void FmDecoder::zero_to_left_right(const SampleVector &samples_mono,
+                                   SampleVector &audio) {
+  unsigned int n = samples_mono.size();
+
+  audio.resize(2 * n);
+  for (unsigned int i = 0; i < n; i++) {
+    audio[2 * i] = 0.0;
+    audio[2 * i + 1] = 0.0;
   }
 }
 
