@@ -41,10 +41,10 @@
 * Mac mini: Roland UA-M10
 * Other machines: C-Media Electronics (generic USB Audio device with headphone output and mic input)
 
-## Software equirement
+## Software requirement
 
 * Linux / macOS / FreeBSD
-* C++11 (gcc and clang will do)
+* C++11 (gcc and clang will do, use `-O2`, *not* `-O3`)
 * [RTL-SDR library](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
 * [sox](http://sox.sourceforge.net/)
 * Supported DVB-T receiver

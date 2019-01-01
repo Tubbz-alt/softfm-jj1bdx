@@ -123,7 +123,6 @@ void usage() {
       "  -s ifrate     IF sample rate in Hz (default 960000)\n"
       "                (valid ranges: [225001, 300000], [900001, 3200000]))\n"
       "  -r pcmrate    Audio sample rate in Hz (default 48000 Hz)\n"
-      "  -M            Disable stereo decoding (output in stereo)\n"
       "  -R filename   Write audio data as raw S16_LE samples\n"
       "                use filename '-' to write to stdout\n"
       "                (default output mode)\n"
@@ -171,7 +170,6 @@ int main(int argc, char **argv) {
   bool agcmode = false;
   double ifrate = 960000;
   int pcmrate = 48000;
-  bool stereo = true;
   enum OutputMode { MODE_RAW, MODE_WAV };
   OutputMode outmode = MODE_RAW;
   bool quietmode = false;
@@ -190,14 +188,14 @@ int main(int argc, char **argv) {
       {"freq", 1, NULL, 'f'},    {"dev", 1, NULL, 'd'},
       {"gain", 1, NULL, 'g'},    {"ifrate", 1, NULL, 's'},
       {"pcmrate", 1, NULL, 'r'}, {"agc", 0, NULL, 'a'},
-      {"mono", 0, NULL, 'M'},    {"raw", 1, NULL, 'R'},
+      {"raw", 1, NULL, 'R'},
       {"wav", 1, NULL, 'W'},     {"play", 2, NULL, 'P'},
       {"pps", 1, NULL, 'T'},     {"buffer", 1, NULL, 'b'},
       {"quiet", 1, NULL, 'q'},   {"pilotshift", 0, NULL, 'X'},
       {NULL, 0, NULL, 0}};
 
   int c, longindex;
-  while ((c = getopt_long(argc, argv, "f:d:g:s:r:MR:W:P::T:b:aqX", longopts,
+  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqX", longopts,
                           &longindex)) >= 0) {
     switch (c) {
     case 'f':
@@ -238,9 +236,6 @@ int main(int argc, char **argv) {
       if (!parse_int(optarg, pcmrate, true) || pcmrate < 1) {
         badarg("-r");
       }
-      break;
-    case 'M':
-      stereo = false;
       break;
     case 'R':
       outmode = MODE_RAW;
@@ -392,7 +387,6 @@ int main(int argc, char **argv) {
   FmDecoder fm(ifrate,                          // sample_rate_if
                freq - tuner_freq,               // tuning_offset
                pcmrate,                         // sample_rate_pcm
-               stereo,                          // stereo
                FmDecoder::default_deemphasis,   // deemphasis,
                FmDecoder::default_bandwidth_if, // bandwidth_if
                FmDecoder::default_freq_dev,     // freq_dev
@@ -451,7 +445,7 @@ int main(int argc, char **argv) {
     if (!quietmode) {
       fprintf(stderr, "writing audio samples to '%s'\n", filename.c_str());
     }
-    audio_output.reset(new WavAudioOutput(filename, pcmrate, stereo));
+    audio_output.reset(new WavAudioOutput(filename, pcmrate));
     break;
   }
 
