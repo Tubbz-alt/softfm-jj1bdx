@@ -471,7 +471,6 @@ int main(int argc, char **argv) {
 
   SampleVector audiosamples;
   bool inbuf_length_warning = false;
-  double audio_level = 0;
   bool got_stereo = false;
 
   double block_time = get_time();
@@ -495,11 +494,6 @@ int main(int argc, char **argv) {
 
     // Decode FM signal.
     fm.process(iqsamples, audiosamples);
-
-    // Measure audio level.
-    double audio_mean, audio_rms;
-    samples_mean_rms(audiosamples, audio_mean, audio_rms);
-    audio_level = 0.95 * audio_level + 0.05 * audio_rms;
 
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
@@ -544,12 +538,11 @@ int main(int argc, char **argv) {
       fprintf(
           stderr,
           // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
-          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB:audio=%+5.1fdB:perr=%+6.4f",
+          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB:perr=%+6.4f",
           block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
           20 * log10(if_level),
           20 * log10(du_ratio),
           20 * log10(fm.get_baseband_level()) + 3.01,
-          20 * log10(audio_level) + 3.01,
           fm.get_phase_error());
       if (outputbuf_samples > 0) {
         const unsigned int nchannel = 2;
