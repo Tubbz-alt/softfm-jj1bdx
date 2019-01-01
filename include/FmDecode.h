@@ -169,6 +169,11 @@ private:
                             const SampleVector &samples_stereo,
                             SampleVector &audio);
 
+  // Fill zero signal in left/right channels.
+  // (samples_mono used for the size determination only)
+  void zero_to_left_right(const SampleVector &samples_mono,
+                          SampleVector &audio);
+
   // Data members.
   const double m_sample_rate_if;
   const double m_sample_rate_baseband;
