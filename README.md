@@ -5,9 +5,9 @@
 
 ## Modification of this fork from the original SoftFM
 
+* Ongoing: merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
 * Remove ALSA dependency to make this software run on macOS
 * Fix other glitches on macOS
-* Merge [ngsoftfm](https://github.com/f4exb/ngsoftfm) code
 * Add quiet mode `-q`
 * Add option `-X` for [Quadratic Multipath Monitor (QMM)](http://ham-radio.com/k6sti/qmm.htm)
 * Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling speed (>900000 samples/sec))
@@ -18,12 +18,10 @@
 
 ### Usage example
 
-       # normal sample rate
-       softfm -f 88100000 -g 8.7 -s 960000 -b 1.0 -R - | \
-          "play -t raw -esigned-integer -b16 -r 48000 -c 2 -
-       # lower sample rate for low performance hosts
-       softfm -f 88100000 -g 8.7 -s 240000 -r 44100 -b 2.0 -R - | \
-          "play -t raw -esigned-integer -b16 -r 44100 -c 2 -
+* See `python-scripts/fmradio.py`
+
+       softfm -f 88100000 -g 8.7 -b 0.5 -R - | \
+          play -t raw -esigned-integer -b16 -r 48000 -c 2 -
 
 ## Tested hardware
 

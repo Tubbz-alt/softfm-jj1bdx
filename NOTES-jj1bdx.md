@@ -30,4 +30,10 @@ The QMM output has the following characteristics: (quote from the Brian's page)
 
 I've implemented the QMM function as `-X` option, and with the variable `pilot_shift`. This option shifts the phase of regenerated subcarrier for decoding the L-R DSB signal from the original `sin(2*x)` (where x represents the 19kHz pilot frequency) to `cos(2*x)`.
 
+## Phase error of 19kHz PLL
+
+1-JAN-2019
+
+Measurements of the local FM stations in Osaka suggest the maximum phase error of 19kHz PLL is +- 0.01~0.02 radian at maximum.
+
 [More to go]
