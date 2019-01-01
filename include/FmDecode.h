@@ -52,7 +52,7 @@ public:
   //             :: (use cos(2*x) instead of sin (2*x))
   //             :: (for multipath distortion detection)
   void process(SampleVector &samples_in, SampleVector &samples_out,
-          bool pilot_shift);
+               bool pilot_shift);
 
   // Return true if the phase-locked loop is locked.
   bool locked() const { return m_lock_cnt >= m_lock_delay; }
@@ -112,13 +112,11 @@ public:
   // pilot_shift      :: True to shift pilot signal phase
   //                  :: (use cos(2*x) instead of sin (2*x))
   //                  :: (for multipath distortion detection)
-  FmDecoder(double sample_rate_if, double tuning_offset,
-            double sample_rate_pcm, double deemphasis = 50,
-            double bandwidth_if = default_bandwidth_if,
+  FmDecoder(double sample_rate_if, double tuning_offset, double sample_rate_pcm,
+            double deemphasis = 50, double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,
             double bandwidth_pcm = default_bandwidth_pcm,
-            unsigned int downsample = 1,
-            bool pilot_shift = false);
+            unsigned int downsample = 1, bool pilot_shift = false);
 
   // Process IQ samples and return audio samples.
   //

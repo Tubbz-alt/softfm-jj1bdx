@@ -185,14 +185,13 @@ int main(int argc, char **argv) {
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
   const struct option longopts[] = {
-      {"freq", 1, NULL, 'f'},    {"dev", 1, NULL, 'd'},
-      {"gain", 1, NULL, 'g'},    {"ifrate", 1, NULL, 's'},
-      {"pcmrate", 1, NULL, 'r'}, {"agc", 0, NULL, 'a'},
-      {"raw", 1, NULL, 'R'},
-      {"wav", 1, NULL, 'W'},     {"play", 2, NULL, 'P'},
-      {"pps", 1, NULL, 'T'},     {"buffer", 1, NULL, 'b'},
-      {"quiet", 1, NULL, 'q'},   {"pilotshift", 0, NULL, 'X'},
-      {NULL, 0, NULL, 0}};
+      {"freq", 1, NULL, 'f'},       {"dev", 1, NULL, 'd'},
+      {"gain", 1, NULL, 'g'},       {"ifrate", 1, NULL, 's'},
+      {"pcmrate", 1, NULL, 'r'},    {"agc", 0, NULL, 'a'},
+      {"raw", 1, NULL, 'R'},        {"wav", 1, NULL, 'W'},
+      {"play", 2, NULL, 'P'},       {"pps", 1, NULL, 'T'},
+      {"buffer", 1, NULL, 'b'},     {"quiet", 1, NULL, 'q'},
+      {"pilotshift", 0, NULL, 'X'}, {NULL, 0, NULL, 0}};
 
   int c, longindex;
   while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqX", longopts,
@@ -529,14 +528,13 @@ int main(int argc, char **argv) {
         du_ratio = (ratio + 1) / (ratio - 1);
       }
 
-      fprintf(
-          stderr,
-          // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
-          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
-          block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
-          20 * log10(if_level),
-          20 * log10(du_ratio),
-          20 * log10(fm.get_baseband_level()) + 3.01);
+      fprintf(stderr,
+              // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB
+              // audio=%+5.1fdB ",
+              "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
+              block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
+              20 * log10(if_level), 20 * log10(du_ratio),
+              20 * log10(fm.get_baseband_level()) + 3.01);
       if (outputbuf_samples > 0) {
         const unsigned int nchannel = 2;
         size_t buflen = output_buffer.queued_samples();
@@ -555,7 +553,6 @@ int main(int argc, char **argv) {
         }
       }
     }
-
   }
 
   // Join background threads.
