@@ -176,7 +176,6 @@ private:
   const int m_tuning_shift;
   const double m_freq_dev;
   const unsigned int m_downsample;
-  const bool m_stereo_enabled;
   const bool m_pilot_shift;
   bool m_stereo_detected;
   double m_if_level;
