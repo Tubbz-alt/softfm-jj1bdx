@@ -132,6 +132,7 @@ void usage() {
       "  -b seconds    Set audio buffer size in seconds\n"
       "  -q            Set quiet mode\n"
       "  -X            Shift pilot phase (for Quadrature Multipath Monitor)\n"
+      "  -U            Set deemphasis to 75 microseconds (default: 50)\n"
       "\n");
 }
 
@@ -180,6 +181,7 @@ int main(int argc, char **argv) {
   bool pilot_shift = false;
   double if_level_max = 0;
   double if_level_min = 10;
+  bool deemphasis_na = false;
 
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
@@ -191,10 +193,11 @@ int main(int argc, char **argv) {
       {"raw", 1, NULL, 'R'},        {"wav", 1, NULL, 'W'},
       {"play", 2, NULL, 'P'},       {"pps", 1, NULL, 'T'},
       {"buffer", 1, NULL, 'b'},     {"quiet", 1, NULL, 'q'},
-      {"pilotshift", 0, NULL, 'X'}, {NULL, 0, NULL, 0}};
+      {"pilotshift", 0, NULL, 'X'}, {"usa", 0, NULL, 'U'},
+      {NULL, 0, NULL, 0}};
 
   int c, longindex;
-  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqX", longopts,
+  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqXU", longopts,
                           &longindex)) >= 0) {
     switch (c) {
     case 'f':
@@ -260,6 +263,9 @@ int main(int argc, char **argv) {
       break;
     case 'X':
       pilot_shift = true;
+      break;
+    case 'U':
+      deemphasis_na = true;
       break;
     default:
       usage();
@@ -376,17 +382,19 @@ int main(int argc, char **argv) {
   // Prevent aliasing at very low output sample rates.
   double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
   double bandwidth_pcm = std::min(default_bandwidth_pcm, 0.45 * pcmrate);
+  double deemphasis = deemphasis_na ? 75.0 : 50.0;
   if (!quietmode) {
     fprintf(stderr, "baseband downsampling factor %u\n", downsample);
     fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
     fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
+    fprintf(stderr, "deemphasis:        %.1f microseconds\n", deemphasis);
   }
 
   // Prepare decoder.
   FmDecoder fm(ifrate,                          // sample_rate_if
                freq - tuner_freq,               // tuning_offset
                pcmrate,                         // sample_rate_pcm
-               FmDecoder::default_deemphasis,   // deemphasis,
+               deemphasis,                      // deemphasis,
                FmDecoder::default_bandwidth_if, // bandwidth_if
                FmDecoder::default_freq_dev,     // freq_dev
                bandwidth_pcm,                   // bandwidth_pcm

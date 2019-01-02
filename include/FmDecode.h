@@ -86,7 +86,8 @@ private:
 // Complete decoder for FM broadcast signal.
 class FmDecoder {
 public:
-  static constexpr double default_deemphasis = 50;
+  static constexpr double default_deemphasis_eu = 50; // Europe and Japan
+  static constexpr double default_deemphasis_na = 75; // USA/Canada
   static constexpr double default_bandwidth_if = 120000;
   static constexpr double default_freq_dev = 75000;
   static constexpr double default_bandwidth_pcm = 15000;
@@ -113,7 +114,8 @@ public:
   //                  :: (use cos(2*x) instead of sin (2*x))
   //                  :: (for multipath distortion detection)
   FmDecoder(double sample_rate_if, double tuning_offset, double sample_rate_pcm,
-            double deemphasis = 50, double bandwidth_if = default_bandwidth_if,
+            double deemphasis = default_deemphasis_eu,
+            double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,
             double bandwidth_pcm = default_bandwidth_pcm,
             unsigned int downsample = 1, bool pilot_shift = false);
