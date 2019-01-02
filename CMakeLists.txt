@@ -52,7 +52,11 @@ set(RTLSDR_INCLUDE_DIRS ${RTLSDR_INCLUDE_DIR} ${LIBUSB_INCLUDE_DIR})
 set(RTLSDR_LIBRARIES    ${RTLSDR_LIBRARY} ${LIBUSB_LIBRARY})
 
 # Compiler flags.
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -ffast-math -ftree-vectorize -march=native ${EXTRA_FLAGS}")
+# Vectorization enabled so far
+# Failed options: -O3, -ffast-math, -march=native (on macOS)
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -fassociative-math -ftree-vectorize ${EXTRA_FLAGS}")
+# Use conservative options when failed to run
+#set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 ${EXTRA_FLAGS}")
 
 set(sfmbase_SOURCES
     sfmbase/RtlSdrSource.cpp

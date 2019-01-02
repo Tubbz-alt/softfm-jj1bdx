@@ -13,8 +13,8 @@
 * Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling speed (>900000 samples/sec))
 * Set default IF bandwidth to 240kHz (+-120kHz)
 * Set default sample rate to 960kHz
-* Use `-march=native` option when compiling (for a portable binary, disable this in the `CMakefile.txt`)
 * Remove 19kHz pilot signal when the stereo PLL is locked
+* Add option `-U` to set deemphasis timing to 75 microseconds for North America (default: 50 microseconds for Europe/Japan)
 
 ### Usage example
 

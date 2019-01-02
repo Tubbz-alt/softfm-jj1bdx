@@ -132,6 +132,7 @@ void usage() {
       "  -b seconds    Set audio buffer size in seconds\n"
       "  -q            Set quiet mode\n"
       "  -X            Shift pilot phase (for Quadrature Multipath Monitor)\n"
+      "  -U            Set deemphasis to 75 microseconds (default: 50)\n"
       "\n");
 }
 
@@ -180,22 +181,23 @@ int main(int argc, char **argv) {
   bool pilot_shift = false;
   double if_level_max = 0;
   double if_level_min = 10;
+  bool deemphasis_na = false;
 
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
   const struct option longopts[] = {
-      {"freq", 1, NULL, 'f'},    {"dev", 1, NULL, 'd'},
-      {"gain", 1, NULL, 'g'},    {"ifrate", 1, NULL, 's'},
-      {"pcmrate", 1, NULL, 'r'}, {"agc", 0, NULL, 'a'},
-      {"raw", 1, NULL, 'R'},
-      {"wav", 1, NULL, 'W'},     {"play", 2, NULL, 'P'},
-      {"pps", 1, NULL, 'T'},     {"buffer", 1, NULL, 'b'},
-      {"quiet", 1, NULL, 'q'},   {"pilotshift", 0, NULL, 'X'},
+      {"freq", 1, NULL, 'f'},       {"dev", 1, NULL, 'd'},
+      {"gain", 1, NULL, 'g'},       {"ifrate", 1, NULL, 's'},
+      {"pcmrate", 1, NULL, 'r'},    {"agc", 0, NULL, 'a'},
+      {"raw", 1, NULL, 'R'},        {"wav", 1, NULL, 'W'},
+      {"play", 2, NULL, 'P'},       {"pps", 1, NULL, 'T'},
+      {"buffer", 1, NULL, 'b'},     {"quiet", 1, NULL, 'q'},
+      {"pilotshift", 0, NULL, 'X'}, {"usa", 0, NULL, 'U'},
       {NULL, 0, NULL, 0}};
 
   int c, longindex;
-  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqX", longopts,
+  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqXU", longopts,
                           &longindex)) >= 0) {
     switch (c) {
     case 'f':
@@ -261,6 +263,9 @@ int main(int argc, char **argv) {
       break;
     case 'X':
       pilot_shift = true;
+      break;
+    case 'U':
+      deemphasis_na = true;
       break;
     default:
       usage();
@@ -377,17 +382,19 @@ int main(int argc, char **argv) {
   // Prevent aliasing at very low output sample rates.
   double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
   double bandwidth_pcm = std::min(default_bandwidth_pcm, 0.45 * pcmrate);
+  double deemphasis = deemphasis_na ? 75.0 : 50.0;
   if (!quietmode) {
     fprintf(stderr, "baseband downsampling factor %u\n", downsample);
     fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
     fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
+    fprintf(stderr, "deemphasis:        %.1f microseconds\n", deemphasis);
   }
 
   // Prepare decoder.
   FmDecoder fm(ifrate,                          // sample_rate_if
                freq - tuner_freq,               // tuning_offset
                pcmrate,                         // sample_rate_pcm
-               FmDecoder::default_deemphasis,   // deemphasis,
+               deemphasis,                      // deemphasis,
                FmDecoder::default_bandwidth_if, // bandwidth_if
                FmDecoder::default_freq_dev,     // freq_dev
                bandwidth_pcm,                   // bandwidth_pcm
@@ -529,14 +536,13 @@ int main(int argc, char **argv) {
         du_ratio = (ratio + 1) / (ratio - 1);
       }
 
-      fprintf(
-          stderr,
-          // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB  audio=%+5.1fdB ",
-          "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
-          block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
-          20 * log10(if_level),
-          20 * log10(du_ratio),
-          20 * log10(fm.get_baseband_level()) + 3.01);
+      fprintf(stderr,
+              // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB
+              // audio=%+5.1fdB ",
+              "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
+              block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
+              20 * log10(if_level), 20 * log10(du_ratio),
+              20 * log10(fm.get_baseband_level()) + 3.01);
       if (outputbuf_samples > 0) {
         const unsigned int nchannel = 2;
         size_t buflen = output_buffer.queued_samples();
@@ -555,7 +561,6 @@ int main(int argc, char **argv) {
         }
       }
     }
-
   }
 
   // Join background threads.

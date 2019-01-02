@@ -105,8 +105,7 @@ PilotPhaseLock::PilotPhaseLock(double freq, double bandwidth,
 // Process samples and generate the 38kHz locked tone;
 // remove remained locked 19kHz tone from samples_in if locked.
 void PilotPhaseLock::process(SampleVector &samples_in,
-                             SampleVector &samples_out,
-                             bool pilot_shift) {
+                             SampleVector &samples_out, bool pilot_shift) {
   unsigned int n = samples_in.size();
 
   samples_out.resize(n);
@@ -187,7 +186,6 @@ void PilotPhaseLock::process(SampleVector &samples_in,
     if (was_locked) {
       samples_in[i] -= psin * m_pilot_level * 2.0;
     }
-
   }
 
   // Update lock status.
@@ -222,9 +220,8 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
       m_tuning_table_size(64),
       m_tuning_shift(lrint(-64.0 * tuning_offset / sample_rate_if)),
       m_freq_dev(freq_dev), m_downsample(downsample),
-      m_pilot_shift(pilot_shift),
-      m_stereo_detected(false), m_if_level(0), m_baseband_mean(0),
-      m_baseband_level(0)
+      m_pilot_shift(pilot_shift), m_stereo_detected(false), m_if_level(0),
+      m_baseband_mean(0), m_baseband_level(0)
 
       // Construct FineTuner
       ,
@@ -338,10 +335,10 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
       // Duplicate L-R shifted output in left/right channels.
       zero_to_left_right(m_buf_stereo, audio);
     } else {
-    // Mono deemphasis
-    m_deemph_mono.process_inplace(m_buf_mono);
-    // Duplicate mono signal in left/right channels.
-    mono_to_left_right(m_buf_mono, audio);
+      // Mono deemphasis
+      m_deemph_mono.process_inplace(m_buf_mono);
+      // Duplicate mono signal in left/right channels.
+      mono_to_left_right(m_buf_mono, audio);
     }
   }
 }
