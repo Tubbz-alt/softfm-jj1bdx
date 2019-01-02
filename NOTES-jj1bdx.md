@@ -38,4 +38,16 @@ I've implemented the QMM function as `-X` option, and with the variable `pilot_s
 
 Measurements of the local FM stations in Osaka suggest the maximum phase error of 19kHz PLL is +- 0.01~0.02 radian at maximum.
 
+## Decimation by DownsampleFilter
+
+2-JAN-2019
+
+Over-optimizing assumption of integer ration on `m_resample_mono()` and `m_resample_stereo()` leads into an assertion error such as:
+
+```
+softfm: /home/kenji/src/softfm-jj1bdx/sfmbase/Filter.cpp:204: void DownsampleFilter::process(const SampleVector&, SampleVector&): Assertion `i == samples_out.size()' failed.
+```
+
+Dealing the assertion error with the compiler optimization option change is a wrong way.
+
 [More to go]
