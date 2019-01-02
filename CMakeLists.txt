@@ -53,8 +53,8 @@ set(RTLSDR_LIBRARIES    ${RTLSDR_LIBRARY} ${LIBUSB_LIBRARY})
 
 # Compiler flags.
 # Vectorization enabled so far
-# Failed options: -O3, -ffast-math, -march=native (on macOS)
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -fassociative-math -ftree-vectorize ${EXTRA_FLAGS}")
+# Failed options: -O3, -fassociative-math, -ffast-math, -march=native (on macOS)
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -ftree-vectorize ${EXTRA_FLAGS}")
 # Use conservative options when failed to run
 #set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 ${EXTRA_FLAGS}")
 
