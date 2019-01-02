@@ -237,7 +237,7 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
 
       // Construct DownsampleFilter for baseband
       ,
-      m_resample_baseband(8 * downsample, 0.4 / downsample, downsample)
+      m_resample_baseband(8 * downsample, 0.4 / downsample, downsample, true)
 
       // Construct PilotPhaseLock
       ,
@@ -249,13 +249,15 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
       ,
       m_resample_mono(int(m_sample_rate_baseband / 1000.0),     // filter_order
                       bandwidth_pcm / m_sample_rate_baseband,   // cutoff
-                      m_sample_rate_baseband / sample_rate_pcm) // downsample
+                      m_sample_rate_baseband / sample_rate_pcm, // downsample
+                      false) // integer_factor
 
       // Construct DownsampleFilter for stereo channel
       ,
       m_resample_stereo(int(m_sample_rate_baseband / 1000.0),   // filter_order
                         bandwidth_pcm / m_sample_rate_baseband, // cutoff
-                        m_sample_rate_baseband / sample_rate_pcm) // downsample
+                        m_sample_rate_baseband / sample_rate_pcm, // downsample
+                        false) // integer_factor
 
       // Construct HighPassFilterIir
       ,
