@@ -18,6 +18,8 @@ Measured result of no-sound period and 880Hz time report tone of NHK-FM Osaka (8
 
 The antenna system seems to be the main factor.
 
+Update: measurement on 2-JAN-2019 showed the similar results.
+
 ## Quadratic Multipath Monitor (QMM)
 
 16-DEC-2018
