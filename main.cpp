@@ -374,10 +374,11 @@ int main(int argc, char **argv) {
   // Start reading from device in separate thread.
   std::thread source_thread(read_source_data, &rtlsdr, &source_buffer);
 
-  // The baseband signal is empty above 100 kHz, so we can
-  // downsample to ~ 200 kS/s without loss of information.
+  // We can downsample to the (default_bandwidth_if * 2) * 1.1
+  // without loss of information.
   // This will speed up later processing stages.
-  unsigned int downsample = std::max(1, int(ifrate / 215.0e3));
+  double downsample_target = FmDecoder::default_bandwidth_if * 2.2;
+  unsigned int downsample = std::max(1, int(ifrate / downsample_target));
 
   // Prevent aliasing at very low output sample rates.
   double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
