@@ -247,14 +247,14 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
 
       // Construct DownsampleFilter for mono channel
       ,
-      m_resample_mono(int(m_sample_rate_baseband / 1000.0),     // filter_order
+      m_resample_mono(int(m_sample_rate_baseband / 800.0),     // filter_order
                       bandwidth_pcm / m_sample_rate_baseband,   // cutoff
                       m_sample_rate_baseband / sample_rate_pcm, // downsample
                       false) // integer_factor
 
       // Construct DownsampleFilter for stereo channel
       ,
-      m_resample_stereo(int(m_sample_rate_baseband / 1000.0),   // filter_order
+      m_resample_stereo(int(m_sample_rate_baseband / 800.0),   // filter_order
                         bandwidth_pcm / m_sample_rate_baseband, // cutoff
                         m_sample_rate_baseband / sample_rate_pcm, // downsample
                         false) // integer_factor
