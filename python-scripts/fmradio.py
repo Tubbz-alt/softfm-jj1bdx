@@ -17,7 +17,7 @@ if argc != 2:
     print('Usage: ', argvs[0], '<frequency in MHz>\n')
     quit()
 freq = float(argvs[1]) * 1000000
-command = "softfm -f " + str(freq) + " -g 8.7 -b 0.5 -q -R - | " + \
+command = "softfm -f " + str(freq) + " -g 12.5 -b 0.5 -q -R - | " + \
           "play -t raw -esigned-integer -b16 -r 48000 -c 2 -q -"
 subprocess.run(command, shell=True, check=True)
 
