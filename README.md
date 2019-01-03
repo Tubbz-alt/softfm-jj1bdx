@@ -10,7 +10,7 @@
 * Fix other glitches on macOS
 * Add quiet mode `-q`
 * Add option `-X` for [Quadratic Multipath Monitor (QMM)](http://ham-radio.com/k6sti/qmm.htm)
-* Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling speed (>900000 samples/sec))
+* Add D/U ratio estimation based on I/F level: see <https://github.com/jj1bdx/rtl_power-fm-multipath> (this requires higher sampling frequency (>900kHz))
 * IF bandwidth: 200kHz (+-100kHz)
 * Set default sample rate to 960kHz
 * Remove 19kHz pilot signal when the stereo PLL is locked
@@ -44,7 +44,7 @@
 ## Software requirement
 
 * Linux / macOS / FreeBSD
-* C++11 (gcc and clang will do, use `-O2`, *not* `-O3`)
+* C++11 (gcc or clang)
 * [RTL-SDR library](http://sdr.osmocom.org/trac/wiki/rtl-sdr)
 * [sox](http://sox.sourceforge.net/)
 * Supported DVB-T receiver
