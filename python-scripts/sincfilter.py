@@ -18,10 +18,9 @@ def mov1(x):
 
 maxfreq = 480000
 
-fitfactor = 0.095303711
+fitfactor = 0.095202571
 sqsum_logratio = 0
-
-for freq in range(0,53000,1000):
+for freq in range(50,54000,1000):
     theta = 2 * math.pi * freq / maxfreq;
     compensate = 1.0 / aperture(theta)
     # filter model: 
