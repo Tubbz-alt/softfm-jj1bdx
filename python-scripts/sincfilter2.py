@@ -26,7 +26,7 @@ for freq in range(50,54000,1000):
     # mov1: moving-average filter (stage number: 1)
     # mov1[n] = (input[n-1] + input[n]) / 2.0
     # final output: gain-controlled sum of the above two filters
-    # output[n] = 4.0 * input[n] - fitfactor * mov1[n]
+    # output[n] = 1.5 * input[n] - fitfactor * mov1[n]
     fitlevel = 1.5 - (fitfactor * mov1(2 * theta))
     logratio = math.log10(compensate / fitlevel)
     sqsum_logratio += logratio * logratio
