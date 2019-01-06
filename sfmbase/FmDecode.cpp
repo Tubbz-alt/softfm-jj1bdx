@@ -48,6 +48,7 @@ void PhaseDiscriminator::process(const IQSampleVector &samples_in,
 // class DiscriminatorEqualizer
 
 // Construct equalizer for phase discriminator.
+// TODO: value optimized for 960kHz sampling rate
 DiscriminatorEqualizer::DiscriminatorEqualizer()
     : m_static_gain(1.1), m_fit_factor(0.095202571),
       m_last1_sample(0.0)
@@ -316,9 +317,8 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   // Extract carrier frequency.
   m_phasedisc.process(m_buf_iffiltered, m_buf_baseband_raw);
 
-  // TODO: equalizer should be put in here
-  // to compensate 0th-hold aperture effect
-  // of the phase discriminator output
+  // Compensate 0th-hold aperture effect
+  // by applying an equalizer to the discriminator output.
   m_disceq.process(m_buf_baseband_raw, m_buf_baseband);
 
   // Downsample baseband signal to reduce processing.
