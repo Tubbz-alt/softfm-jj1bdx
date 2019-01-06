@@ -15,12 +15,13 @@
 * Set default sample rate to 960kHz
 * Remove 19kHz pilot signal when the stereo PLL is locked
 * Add option `-U` to set deemphasis timing to 75 microseconds for North America (default: 50 microseconds for Europe/Japan)
+* Add experimental equalizer to compensate 0th-hold aperture effect of phase discriminator output (currently with fixed parameter for 960kHz sampling rate)
 
 ### Usage example
 
 * See `python-scripts/fmradio.py`
 
-       softfm -f 88100000 -g 8.7 -b 0.5 -R - | \
+       softfm -f 88100000 -g 12.5 -b 0.5 -R - | \
           play -t raw -esigned-integer -b16 -r 48000 -c 2 -
 
 ## Tested hardware
