@@ -326,7 +326,7 @@ int main(int argc, char **argv) {
   }
 
   // Intentionally tune at a higher frequency to avoid DC offset.
-  double tuner_freq = freq + 0.2 * ifrate;
+  double tuner_freq = freq + 0.3 * ifrate;
 
   // Open RTL-SDR device.
   RtlSdrSource rtlsdr(devidx);
