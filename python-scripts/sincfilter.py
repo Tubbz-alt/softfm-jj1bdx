@@ -24,11 +24,10 @@ for freq in range(50,54000,1000):
     theta = 2 * math.pi * freq / maxfreq;
     compensate = 1.0 / aperture(theta)
     # filter model: 
-    # output[n] = input[n] * 1.1 -
-    #   fitfactor * (input[n-1] + input[n]) / 2.0
-    # ->
-    # output[n] = input[n] * (1.1 - fitfactor / 2.0) -
-    #             input[n-1] * fitfactor / 2.0
+    # mov1: moving-average filter (stage number: 1)
+    # mov1[n] = (input[n-1] + input[n]) / 2.0
+    # final output: gain-controlled sum of the above two filters
+    # output[n] = 1.1 * input[n] - fitfactor * mov1[n]
     fitlevel = 1.1 - (fitfactor * mov1(2 * theta))
     logratio = math.log10(compensate / fitlevel)
     sqsum_logratio += logratio * logratio
