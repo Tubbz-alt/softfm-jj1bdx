@@ -259,29 +259,6 @@ void DownsampleFilter::process(const SampleVector &samples_in,
   }
 }
 
-// class MovingAverageFilter
-
-// Construct 1st-order moving average filter.
-MovingAverageFilter::MovingAverageFilter():
-    m_y0_1(0) {
-}
-
-// Process samples.
-void MovingAverageFilter::process(const SampleVector &samples_in,
-                              SampleVector &samples_out) {
-  unsigned int n = samples_in.size();
-  samples_out.resize(n);
-
-  Sample y = m_y0_1;
-
-  for (unsigned int i = 0; i < n; i++) {
-    Sample x = samples_in[i];
-    y += x;
-    samples_out[i] = y / 2.0;
-  }
-  m_y0_1 = y;
-}
-
 // class LowPassFilterRC
 
 // Construct 1st order low-pass IIR filter.

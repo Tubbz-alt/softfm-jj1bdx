@@ -26,6 +26,22 @@ private:
   IQSample m_last2_sample;
 };
 
+class DiscriminatorEqualizer {
+public:
+  // Construct equalizer for phase discriminator.
+  DiscriminatorEqualizer();
+
+  // process samples.
+  // Output is a sequence of equalized output.
+  void process(const SampleVector &samples_in, SampleVector &samples_out);
+
+private:
+  double m_static_gain;
+  double m_fit_factor;
+  double m_last1_sample;
+
+};
+
 // Phase-locked loop for stereo pilot.
 class PilotPhaseLock {
 public:
@@ -190,6 +206,7 @@ private:
   IQSampleVector m_buf_iftuned;
   IQSampleVector m_buf_iffiltered;
   SampleVector m_buf_baseband;
+  SampleVector m_buf_baseband_raw;
   SampleVector m_buf_mono;
   SampleVector m_buf_rawstereo;
   SampleVector m_buf_stereo;
@@ -197,6 +214,7 @@ private:
   FineTuner m_finetuner;
   LowPassFilterFirIQ m_iffilter;
   PhaseDiscriminator m_phasedisc;
+  DiscriminatorEqualizer m_disceq;
   DownsampleFilter m_resample_baseband;
   PilotPhaseLock m_pilotpll;
   DownsampleFilter m_resample_mono;

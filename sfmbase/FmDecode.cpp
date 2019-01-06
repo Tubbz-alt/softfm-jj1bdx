@@ -18,7 +18,7 @@ static IQSample::value_type peak_level_approx(const IQSampleVector &samples) {
 
   return sqrt(peak_level);
 }
-//
+
 // class PhaseDiscriminator
 
 // Construct phase discriminator.
@@ -42,6 +42,30 @@ void PhaseDiscriminator::process(const IQSampleVector &samples_in,
   }
 
   m_last2_sample = m_last1_sample;
+  m_last1_sample = s0;
+}
+
+// class DiscriminatorEqualizer
+
+// Construct equalizer for phase discriminator.
+DiscriminatorEqualizer::DiscriminatorEqualizer()
+    : m_static_gain(1.1), m_fit_factor(0.095202571),
+      m_last1_sample(0.0)
+{
+}
+
+void DiscriminatorEqualizer::process(const SampleVector &samples_in,
+                                 SampleVector &samples_out) {
+  unsigned int n = samples_in.size();
+  Sample s0 = m_last1_sample;
+  samples_out.resize(n);
+
+  for (unsigned int i = 0; i < n; i++) {
+    Sample s1 = samples_in[i];
+    Sample mov1 = (s0 + s1) / 2.0;
+    samples_out[i] = m_static_gain * s1 - m_fit_factor * mov1;
+    s0 = s1;
+  }
   m_last1_sample = s0;
 }
 
@@ -235,6 +259,10 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
       ,
       m_phasedisc(freq_dev / sample_rate_if)
 
+      // Construct DiscriminatorEqualizer
+      ,
+      m_disceq()
+
       // Construct DownsampleFilter for baseband
       ,
       m_resample_baseband(8 * downsample, 0.4 / downsample, downsample, true)
@@ -286,11 +314,12 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   m_if_level = peak_level_approx(m_buf_iffiltered);
 
   // Extract carrier frequency.
-  m_phasedisc.process(m_buf_iffiltered, m_buf_baseband);
+  m_phasedisc.process(m_buf_iffiltered, m_buf_baseband_raw);
 
   // TODO: equalizer should be put in here
   // to compensate 0th-hold aperture effect
   // of the phase discriminator output
+  m_disceq.process(m_buf_baseband_raw, m_buf_baseband);
 
   // Downsample baseband signal to reduce processing.
   if (m_downsample > 1) {

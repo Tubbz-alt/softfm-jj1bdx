@@ -83,19 +83,6 @@ private:
   SampleVector m_state;
 };
 
-// First order moving average filter
-class MovingAverageFilter {
-public:
-  // Construct 1st order moving average filter
-  MovingAverageFilter();
-
-  // Process samples.
-  void process(const SampleVector &samples_in, SampleVector &samples_out);
-
-private:
-  Sample m_y0_1;
-};
-
 // First order low-pass IIR filter for real-valued signals.
 class LowPassFilterRC {
 public:
