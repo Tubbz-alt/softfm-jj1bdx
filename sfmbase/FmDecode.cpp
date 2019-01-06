@@ -288,6 +288,10 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   // Extract carrier frequency.
   m_phasedisc.process(m_buf_iffiltered, m_buf_baseband);
 
+  // TODO: equalizer should be put in here
+  // to compensate 0th-hold aperture effect
+  // of the phase discriminator output
+
   // Downsample baseband signal to reduce processing.
   if (m_downsample > 1) {
     SampleVector tmp(move(m_buf_baseband));
