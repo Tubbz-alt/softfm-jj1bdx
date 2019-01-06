@@ -120,8 +120,6 @@ void usage() {
       "(default 0)\n"
       "  -g gain       Set LNA gain in dB, or 'auto' (default auto)\n"
       "  -a            Enable RTL AGC mode (default disabled)\n"
-      "  -s ifrate     IF sample rate in Hz (default 960000)\n"
-      "                (valid ranges: [225001, 300000], [900001, 3200000]))\n"
       "  -r pcmrate    Audio sample rate in Hz (default 48000)\n"
       "  -R filename   Write audio data as raw S16_LE samples\n"
       "                use filename '-' to write to stdout\n"
@@ -133,6 +131,7 @@ void usage() {
       "  -q            Set quiet mode\n"
       "  -X            Shift pilot phase (for Quadrature Multipath Monitor)\n"
       "  -U            Set deemphasis to 75 microseconds (default: 50)\n"
+      "  -L            Set if sample rate to 240kHz (default: 960kHz)\n"
       "\n");
 }
 
@@ -182,22 +181,26 @@ int main(int argc, char **argv) {
   double if_level_max = 0;
   double if_level_min = 10;
   bool deemphasis_na = false;
+  bool low_iffreq = false;
+  double ifeq_static_gain = 1.0;
+  double ifeq_fit_factor = 0.0;
 
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
   const struct option longopts[] = {
       {"freq", 1, NULL, 'f'},       {"dev", 1, NULL, 'd'},
-      {"gain", 1, NULL, 'g'},       {"ifrate", 1, NULL, 's'},
+      {"gain", 1, NULL, 'g'},
       {"pcmrate", 1, NULL, 'r'},    {"agc", 0, NULL, 'a'},
       {"raw", 1, NULL, 'R'},        {"wav", 1, NULL, 'W'},
       {"play", 2, NULL, 'P'},       {"pps", 1, NULL, 'T'},
       {"buffer", 1, NULL, 'b'},     {"quiet", 1, NULL, 'q'},
       {"pilotshift", 0, NULL, 'X'}, {"usa", 0, NULL, 'U'},
+      {"lowif", 0, NULL, 'L'},
       {NULL, 0, NULL, 0}};
 
   int c, longindex;
-  while ((c = getopt_long(argc, argv, "f:d:g:s:r:R:W:P::T:b:aqXU", longopts,
+  while ((c = getopt_long(argc, argv, "f:d:g:r:R:W:P::T:b:aqXUL", longopts,
                           &longindex)) >= 0) {
     switch (c) {
     case 'f':
@@ -224,14 +227,6 @@ int main(int argc, char **argv) {
           badarg("-g");
         }
         lnagain = tmpgain2;
-      }
-      break;
-    case 's':
-      // NOTE: RTL does not support some sample rates below 900 kS/s
-      // Also, max sampling rate is 3.2 MS/s
-      if (!parse_dbl(optarg, ifrate) || (ifrate < 225001) ||
-          (ifrate > 3200000) || ((ifrate > 300000) && (ifrate < 900001))) {
-        badarg("-s");
       }
       break;
     case 'r':
@@ -267,6 +262,9 @@ int main(int argc, char **argv) {
     case 'U':
       deemphasis_na = true;
       break;
+    case 'L':
+      low_iffreq = true;
+      break;
     default:
       usage();
       fprintf(stderr, "ERROR: Invalid command line options\n");
@@ -301,6 +299,16 @@ int main(int argc, char **argv) {
     usage();
     fprintf(stderr, "ERROR: Specify a tuning frequency\n");
     exit(1);
+  }
+
+  if (low_iffreq) {
+      ifrate = 240000;
+      ifeq_static_gain = 1.5;
+      ifeq_fit_factor = 0.520374809;
+  } else {
+      ifrate = 960000;
+      ifeq_static_gain = 1.1;
+      ifeq_fit_factor = 0.095202571;
   }
 
   // Catch Ctrl-C and SIGTERM
@@ -393,6 +401,8 @@ int main(int argc, char **argv) {
 
   // Prepare decoder.
   FmDecoder fm(ifrate,                          // sample_rate_if
+               ifeq_static_gain,                // ifeq_static_gain
+               ifeq_fit_factor,                 // ifeq_fit_factor
                freq - tuner_freq,               // tuning_offset
                pcmrate,                         // sample_rate_pcm
                deemphasis,                      // deemphasis,

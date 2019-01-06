@@ -29,7 +29,7 @@ private:
 class DiscriminatorEqualizer {
 public:
   // Construct equalizer for phase discriminator.
-  DiscriminatorEqualizer();
+  DiscriminatorEqualizer(double ifeq_static_gain, double ifeq_fit_factor);
 
   // process samples.
   // Output is a sequence of equalized output.
@@ -112,6 +112,8 @@ public:
   // Construct FM decoder.
   // Stereo decoding always enabled.
   // sample_rate_if   :: IQ sample rate in Hz.
+  // ifeq_static_gain :: IF DiscriminatorEqualizer static_gain
+  // ifeq_fit_factor  :: IF DiscriminatorEqualizer fit_factor
   // tuning_offset    :: Frequency offset in Hz of radio station with respect
   //                     to receiver LO frequency (positive value means
   //                     station is at higher frequency than LO).
@@ -129,7 +131,9 @@ public:
   // pilot_shift      :: True to shift pilot signal phase
   //                  :: (use cos(2*x) instead of sin (2*x))
   //                  :: (for multipath distortion detection)
-  FmDecoder(double sample_rate_if, double tuning_offset, double sample_rate_pcm,
+  FmDecoder(double sample_rate_if,
+            double ifeq_static_gain, double ifeq_fit_factor,
+            double tuning_offset, double sample_rate_pcm,
             double deemphasis = default_deemphasis_eu,
             double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,

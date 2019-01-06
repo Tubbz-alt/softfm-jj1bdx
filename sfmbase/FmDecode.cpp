@@ -49,8 +49,9 @@ void PhaseDiscriminator::process(const IQSampleVector &samples_in,
 
 // Construct equalizer for phase discriminator.
 // TODO: value optimized for 960kHz sampling rate
-DiscriminatorEqualizer::DiscriminatorEqualizer()
-    : m_static_gain(1.1), m_fit_factor(0.095202571),
+DiscriminatorEqualizer::DiscriminatorEqualizer(
+        double ifeq_static_gain, double ifeq_fit_factor)
+    : m_static_gain(ifeq_static_gain), m_fit_factor(ifeq_fit_factor),
       m_last1_sample(0.0)
 {
 }
@@ -234,7 +235,9 @@ void PilotPhaseLock::process(SampleVector &samples_in,
 
 // class FmDecoder
 
-FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
+FmDecoder::FmDecoder(double sample_rate_if,
+                     double ifeq_static_gain, double ifeq_fit_factor,
+                     double tuning_offset,
                      double sample_rate_pcm, double deemphasis,
                      double bandwidth_if, double freq_dev, double bandwidth_pcm,
                      unsigned int downsample, bool pilot_shift)
@@ -262,7 +265,7 @@ FmDecoder::FmDecoder(double sample_rate_if, double tuning_offset,
 
       // Construct DiscriminatorEqualizer
       ,
-      m_disceq()
+      m_disceq(ifeq_static_gain, ifeq_fit_factor)
 
       // Construct DownsampleFilter for baseband
       ,
