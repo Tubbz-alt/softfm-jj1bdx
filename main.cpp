@@ -326,11 +326,8 @@ int main(int argc, char **argv) {
             strerror(errno));
   }
 
-  // Tuner frequency should start from the given frequency;
-  // this will reduce the time of fine tuning.
-  // TODO: this might affect the possible spurious beat signals
-  // of the output: measurement needed.
-  double tuner_freq = freq;
+  // Intentionally tune at a higher frequency to avoid DC offset.
+  double tuner_freq = freq + 0.25 * ifrate;
 
   // Open RTL-SDR device.
   RtlSdrSource rtlsdr(devidx);
