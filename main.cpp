@@ -303,12 +303,12 @@ int main(int argc, char **argv) {
 
   if (low_iffreq) {
       ifrate = 240000;
-      ifeq_static_gain = 1.5;
-      ifeq_fit_factor = 0.520374809;
+      ifeq_static_gain = 1.47112063;
+      ifeq_fit_factor = 0.48567701;
   } else {
       ifrate = 960000;
-      ifeq_static_gain = 1.1;
-      ifeq_fit_factor = 0.095202571;
+      ifeq_static_gain = 1.3412962;
+      ifeq_fit_factor = 0.34135089;
   }
 
   // Catch Ctrl-C and SIGTERM
