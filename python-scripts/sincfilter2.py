@@ -17,17 +17,18 @@ def mov1(x):
         return 0.5 * math.sin(x/2.0) / math.sin (x/4.0)
 
 maxfreq = 120000
-fitfactor = 0.520374809
+staticgain = 1.47112063
+fitfactor = 0.48567701
 sqsum_logratio = 0
-for freq in range(50,54000,1000):
+for freq in range(50,53100,1000):
     theta = 2 * math.pi * freq / maxfreq;
     compensate = 1.0 / aperture(theta)
     # filter model: 
     # mov1: moving-average filter (stage number: 1)
     # mov1[n] = (input[n-1] + input[n]) / 2.0
     # final output: gain-controlled sum of the above two filters
-    # output[n] = 1.5 * input[n] - fitfactor * mov1[n]
-    fitlevel = 1.5 - (fitfactor * mov1(2 * theta))
+    # output[n] = staticgain * input[n] - fitfactor * mov1[n]
+    fitlevel = staticgain - (fitfactor * mov1(2 * theta))
     logratio = math.log10(compensate / fitlevel)
     sqsum_logratio += logratio * logratio
     output = "freq = " + str(freq);
@@ -35,5 +36,6 @@ for freq in range(50,54000,1000):
     output += " fitlevel = " + str(fitlevel)
     output += " logratio = " + str(logratio)
     print(output)
+
 print("factor = " + str(fitfactor) + " sqsum_logratio = " + str(sqsum_logratio))
 
