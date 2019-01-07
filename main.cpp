@@ -326,8 +326,11 @@ int main(int argc, char **argv) {
             strerror(errno));
   }
 
-  // Intentionally tune at a higher frequency to avoid DC offset.
-  double tuner_freq = freq + 0.2 * ifrate;
+  // Tuner frequency should start from the given frequency;
+  // this will reduce the time of fine tuning.
+  // TODO: this might affect the possible spurious beat signals
+  // of the output: measurement needed.
+  double tuner_freq = freq;
 
   // Open RTL-SDR device.
   RtlSdrSource rtlsdr(devidx);
@@ -393,8 +396,9 @@ int main(int argc, char **argv) {
   double default_bandwidth_pcm = FmDecoder::default_bandwidth_pcm;
   double bandwidth_pcm = std::min(default_bandwidth_pcm, 0.45 * pcmrate);
   double deemphasis = deemphasis_na ? 75.0 : 50.0;
+
   if (!quietmode) {
-    fprintf(stderr, "baseband downsampling factor %u\n", downsample);
+    fprintf(stderr, "if -> baseband:    %u (downsampled by)\n", downsample);
     fprintf(stderr, "audio sample rate: %u Hz\n", pcmrate);
     fprintf(stderr, "audio bandwidth:   %.3f kHz\n", bandwidth_pcm * 1.0e-3);
     fprintf(stderr, "deemphasis:        %.1f microseconds\n", deemphasis);
