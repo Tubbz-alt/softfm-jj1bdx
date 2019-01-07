@@ -72,13 +72,21 @@ For 60kHz, the signal level decreases as:
 * Nyquist frequency = 480kHz (ifrate = 960kHz): 0.9745, -0.224dB
 * Nyquist frequency = 120kHz (ifrate = 240kHz): 0.6366, -3.922dB (!)
 
-### 6-JAN-2019
+### 7-JAN-2019
 
 Added experimental filter class DiscriminatorEqualizer for 960kHz sample rate. Parameters for 240kHz sample rate have also been computed.
 
-The filter model: amplifier setting the maximum gain + 1st-order moving average filter (an LPF) with a constant gain to *deduce* the signal, so that the result filter emphasizes the higher frequency with the maximum gain set. The two gain parameters are computed by the least-square-maximum method so that the logarithmic ratio value of the compensation values and the filter outputs for each frequency for 50, 1050, 2050, ..., 53050Hz is minimized and closest to zero.
+The filter model:
 
-* Sample rate 960kHz: static gain: 1.1, moving filter gain (fitfactor): 0.095202571
-* Sample rate 240kHz: static gain: 1.5, moving filter gain (fitfactor): 0.520374809
+Amplifier setting the maximum static gain + 1st-order moving average filter (an LPF) with a constant gain to *deduce* the signal, so that the result filter emphasizes the higher frequency with the maximum gain set.
+
+The two gain parameters are computed by the least-square-maximum method so that the logarithmic ratio value of the compensation values and the filter outputs for each frequency for 51, 1050, 2050, ..., 57050Hz is minimized and closest to zero.
+
+Note: static gain minus moving filter gain must not be less than 10^(-0.05) (-0.1dB).
+
+Computed result by SciPy scipy.optimize.fmin:
+
+* Sample rate 960kHz: static gain: 1.47112063, moving filter gain (fitfactor): 0.48567701
+* Sample rate 240kHz: static gain: 1.3412962, moving filter gain (fitfactor): 0.34135089
 
 [More to go]
