@@ -31,6 +31,15 @@ Revised measured result of no-sound period and 880Hz time report tone of NHK-FM 
 * Noise level of the no-sound period: ~ -74dBFS +- 1dBFS
 * THD+N level of the 880Hz tone: ~ 0.82% (multipath distortion possible) +- 0.1%
 
+### 7-JAN-2019
+
+For 240kHz sampling frequency:
+
+Measured result of no-sound period and 880Hz time report tone of NHK-FM Osaka (88.1MHz):
+
+* Noise level of the no-sound period: ~ -57dBFS (Two beat signals at ~9kHz and ~10kHz, reason unknown)
+* THD+N level of the 880Hz tone: ~ 1.07% (multipath distortion possible) +- 0.3%
+
 ## Quadratic Multipath Monitor (QMM)
 
 ### 16-DEC-2018
