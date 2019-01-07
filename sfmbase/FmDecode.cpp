@@ -308,20 +308,17 @@ FmDecoder::FmDecoder(double sample_rate_if,
 }
 
 void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
+
   // Fine tuning.
   m_finetuner.process(samples_in, m_buf_iftuned);
-
   // Low pass filter to isolate station.
   m_iffilter.process(m_buf_iftuned, m_buf_iffiltered);
-
   // Measure IF peak level.
   m_if_level = peak_level_approx(m_buf_iffiltered);
-
   // Extract carrier frequency.
   m_phasedisc.process(m_buf_iffiltered, m_buf_baseband_raw);
-
   // Compensate 0th-hold aperture effect
-  // by applying an equalizer to the discriminator output.
+  // by applying the equalizer to the discriminator output.
   m_disceq.process(m_buf_baseband_raw, m_buf_baseband);
 
   // Downsample baseband signal to reduce processing.
@@ -354,7 +351,6 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
   // because the downsamplers for mono and stereo signal must be
   // kept in sync.
   m_resample_stereo.process(m_buf_rawstereo, m_buf_stereo);
-
   // DC blocking
   m_dcblock_stereo.process_inplace(m_buf_stereo);
 
@@ -370,7 +366,7 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
     m_deemph_stereo.process_inplace(audio);
   } else {
     if (m_pilot_shift) {
-      // Duplicate L-R shifted output in left/right channels.
+      // Fill zero output in left/right channels.
       zero_to_left_right(m_buf_stereo, audio);
     } else {
       // Mono deemphasis
