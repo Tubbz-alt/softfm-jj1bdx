@@ -185,7 +185,7 @@ int main(int argc, char **argv) {
   double ifeq_static_gain = 1.0;
   double ifeq_fit_factor = 0.0;
 
-  fprintf(stderr, "softfm-jj1bdx Version 0.2.0\n");
+  fprintf(stderr, "softfm-jj1bdx Version 0.2.1-dev\n");
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
@@ -368,6 +368,7 @@ int main(int argc, char **argv) {
   ifrate = rtlsdr.get_sample_rate();
 
   if (!quietmode) {
+    fprintf(stderr, "First tuned for:   %.6f MHz\n", freq * 1.0e-6);
     fprintf(stderr, "device tuned for:  %.6f MHz\n", tuner_freq * 1.0e-6);
     if (lnagain == INT_MIN) {
       fprintf(stderr, "LNA gain:          auto\n");
@@ -379,6 +380,9 @@ int main(int argc, char **argv) {
     fprintf(stderr, "RTL AGC mode:      %s\n",
             agcmode ? "enabled" : "disabled");
   }
+
+  double delta_if = tuner_freq - freq;
+  MovingAverage<float> ppm_average(40, 0.0f);
 
   // Create source data queue.
   DataBuffer<IQSample> source_buffer;
@@ -515,6 +519,9 @@ int main(int argc, char **argv) {
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
 
+    // The minus factor is to show the ppm correction to make and not the one made
+    ppm_average.feed(((fm.get_tuning_offset() + delta_if) / tuner_freq) * -1.0e6);
+
     // Write PPS markers.
     if (ppsfile != NULL) {
       for (const PilotPhaseLock::PpsEvent &ev : fm.get_pps_events()) {
@@ -553,10 +560,9 @@ int main(int argc, char **argv) {
       }
 
       fprintf(stderr,
-              // "\rblk=%6d  freq=%8.4fMHz  IF=%+5.1fdB  BB=%+5.1fdB
-              // audio=%+5.1fdB ",
-              "\rblk=%6d:f=%8.4fMHz:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
+              "\rblk=%6d:f=%8.4fMHz:ppm=%+6.2f:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
               block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
+              ppm_average.average(),
               20 * log10(if_level), 20 * log10(du_ratio),
               20 * log10(fm.get_baseband_level()) + 3.01);
       if (outputbuf_samples > 0) {
