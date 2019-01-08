@@ -48,7 +48,7 @@ Brian Beezley, K6STI, describes his idea of [Quadratic Multipath Monitor (QMM)](
 
 The QMM output has the following characteristics: (quote from the Brian's page)
 
-> For a perfectly transmitted and received signal, you'll get no output. For a real signal you may hear L+R harmonics, phase-rotated L−R intermodulation products, or crossmodulation between L+R, L−R, SCA, RDS, or HD Radio sidebands. Multipath propagation can cause any of these artifacts. You may also hear co-channel interference, adjacent-channel interference, HD Radio self-noise, or background noise.
+> For a perfectly transmitted and received signal, you'll get no output. For a real signal you may hear L+R harmonics, phase-rotated L竏坦 intermodulation products, or crossmodulation between L+R, L竏坦, SCA, RDS, or HD Radio sidebands. Multipath propagation can cause any of these artifacts. You may also hear co-channel interference, adjacent-channel interference, HD Radio self-noise, or background noise.
 
 I've implemented the QMM function as `-X` option, and with the variable `pilot_shift`. This option shifts the phase of regenerated subcarrier for decoding the L-R DSB signal from the original `sin(2*x)` (where x represents the 19kHz pilot frequency) to `cos(2*x)`.
 
@@ -97,5 +97,13 @@ Computed result by SciPy scipy.optimize.fmin:
 
 * Sample rate 960kHz: static gain: 1.47112063, moving filter gain (fitfactor): 0.48567701
 * Sample rate 240kHz: static gain: 1.3412962, moving filter gain (fitfactor): 0.34135089
+
+## References
+
+(Including Japanese books here with Japanese titles)
+
+* Brian Beezley, K6STI, [88-108MHz](http://ham-radio.com/k6sti/)
+* 林 輝彦, FPGA FMチューナ: 第2章 フィルタとFMステレオ復調のメカニズム, [トラ技エレキ工房 No.1](http://www.cqpub.co.jp/hanbai/books/46/46511.htm), CQ出版, 2013, ISBN-13: 9784789846516, pp. 89-119
+* 三上 直樹, [はじめて学ぶディジタル・フィルタと高速フーリエ変換](http://www.cqpub.co.jp/hanbai/books/30/30881.htm), CQ出版, 2005, ISBN-13: 9784789830881
 
 [More to go]
