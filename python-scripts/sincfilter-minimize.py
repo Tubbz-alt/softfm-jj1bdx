@@ -3,7 +3,6 @@
 
 import math
 from scipy import optimize
-from scipy.optimize import fmin
 
 def aperture(x):
     if x == 0.0:
@@ -39,5 +38,9 @@ def sincfitting(maxfreq, staticgain, fitfactor):
 def sincfitting_test(x, f):
     return sincfitting(f, x[0], x[1])
 
-print(fmin(sincfitting_test, [1.5, 0.5], args=(120000.0,)))
-print(fmin(sincfitting_test, [1.1, 0.095], args=(480000.0,)))
+print(optimize.minimize(
+        sincfitting_test, [1.5, 0.5], args=(120000.0,),
+        method="Nelder-Mead"))
+print(optimize.minimize(
+        sincfitting_test, [1.1, 0.095], args=(480000.0,),
+        method="Nelder-Mead"))
