@@ -20,6 +20,7 @@ maxfreq = 480000
 staticgain = 1.3412962
 fitfactor = 0.34135089
 sqsum_logratio = 0
+
 for freq in range(50,53100,1000):
     theta = 2 * math.pi * freq / maxfreq;
     compensate = 1.0 / aperture(theta)
@@ -30,12 +31,5 @@ for freq in range(50,53100,1000):
     # output[n] = staticgain * input[n] - fitfactor * mov1[n]
     fitlevel = staticgain - (fitfactor * mov1(2 * theta))
     logratio = math.log10(compensate / fitlevel)
-    sqsum_logratio += logratio * logratio
-    output = "freq = " + str(freq);
-    output += " compensate = " + str(compensate)
-    output += " fitlevel = " + str(fitlevel)
-    output += " logratio = " + str(logratio)
-    print(output)
-
-print("factor = " + str(fitfactor) + " sqsum_logratio = " + str(sqsum_logratio))
+    print(freq, compensate, fitlevel, logratio)
 
