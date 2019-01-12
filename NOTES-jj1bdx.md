@@ -48,7 +48,7 @@ Brian Beezley, K6STI, describes his idea of [Quadratic Multipath Monitor (QMM)](
 
 The QMM output has the following characteristics: (quote from the Brian's page)
 
-> For a perfectly transmitted and received signal, you'll get no output. For a real signal you may hear L+R harmonics, phase-rotated L竏坦 intermodulation products, or crossmodulation between L+R, L竏坦, SCA, RDS, or HD Radio sidebands. Multipath propagation can cause any of these artifacts. You may also hear co-channel interference, adjacent-channel interference, HD Radio self-noise, or background noise.
+> For a perfectly transmitted and received signal, you'll get no output. For a real signal you may hear L+R harmonics, phase-rotated L-R intermodulation products, or crossmodulation between L+R, L-R, SCA, RDS, or HD Radio sidebands. Multipath propagation can cause any of these artifacts. You may also hear co-channel interference, adjacent-channel interference, HD Radio self-noise, or background noise.
 
 I've implemented the QMM function as `-X` option, and with the variable `pilot_shift`. This option shifts the phase of regenerated subcarrier for decoding the L-R DSB signal from the original `sin(2*x)` (where x represents the 19kHz pilot frequency) to `cos(2*x)`.
 
@@ -97,6 +97,18 @@ Computed result by SciPy scipy.optimize.fmin:
 
 * Sample rate 960kHz: static gain: 1.47112063, moving filter gain (fitfactor): 0.48567701
 * Sample rate 240kHz: static gain: 1.3412962, moving filter gain (fitfactor): 0.34135089
+
+Here are the results for 960kHz Sample rate:
+
+![compensation curve for 960kHz rate](NOTES-compensation-960kHz.md)
+
+![logratio curve for 960kHz rate](NOTES-logratio-960kHz.md)
+
+Here are the results for 240kHz Sample rate:
+
+![compensation curve for 240kHz rate](NOTES-compensation-240kHz.md)
+
+![logratio curve for 240kHz rate](NOTES-logratio-240kHz.md)
 
 ## References
 
