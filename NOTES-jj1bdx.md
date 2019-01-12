@@ -83,9 +83,9 @@ For 60kHz, the signal level decreases as:
 
 ### 7-JAN-2019
 
-Added experimental filter class DiscriminatorEqualizer for 960kHz sample rate. Parameters for 240kHz sample rate have also been computed.
+Added experimental filter class DiscriminatorEqualizer for 960kHz and 240kHz sample rates.
 
-The filter model:
+#### The filter model
 
 Amplifier setting the maximum static gain + 1st-order moving average filter (an LPF) with a constant gain to *deduce* the signal, so that the result filter emphasizes the higher frequency with the maximum gain set.
 
@@ -93,7 +93,7 @@ The two gain parameters are computed by the least-square-maximum method so that 
 
 Note: static gain minus moving filter gain must not be less than 10^(-0.05) (-0.1dB).
 
-Computed result by SciPy scipy.optimize.fmin:
+#### Computed results by SciPy scipy.optimize.minimize with the Nelder-Mead method
 
 * Sample rate 960kHz: static gain: 1.47112063, moving filter gain (fitfactor): 0.48567701
 * Sample rate 240kHz: static gain: 1.3412962, moving filter gain (fitfactor): 0.34135089
@@ -109,6 +109,8 @@ Here are the results for 240kHz Sample rate:
 ![compensation curve for 240kHz rate](NOTES-compensation-240kHz.png)
 
 ![logratio curve for 240kHz rate](NOTES-logratio-240kHz.png)
+
+The results show the differences between the required compensation curve and the fitted filter models are below <0.0006dB for 960kHz; and for 240kHz the maximum difference is far wider (~0.18dB on 53kHz).
 
 ## References
 
