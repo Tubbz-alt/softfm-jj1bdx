@@ -245,8 +245,8 @@ FmDecoder::FmDecoder(double sample_rate_if,
     // Initialize member fields
     : m_sample_rate_if(sample_rate_if),
       m_sample_rate_baseband(sample_rate_if / downsample),
-      m_tuning_table_size(64),
-      m_tuning_shift(lrint(-64.0 * tuning_offset / sample_rate_if)),
+      m_tuning_table_size(finetuner_table_size),
+      m_tuning_shift(lrint(-double(finetuner_table_size) * tuning_offset / sample_rate_if)),
       m_freq_dev(freq_dev), m_downsample(downsample),
       m_pilot_shift(pilot_shift), m_stereo_detected(false), m_if_level(0),
       m_baseband_mean(0), m_baseband_level(0)
