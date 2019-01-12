@@ -100,15 +100,15 @@ Computed result by SciPy scipy.optimize.fmin:
 
 Here are the results for 960kHz Sample rate:
 
-![compensation curve for 960kHz rate](NOTES-compensation-960kHz.md)
+![compensation curve for 960kHz rate](NOTES-compensation-960kHz.png)
 
-![logratio curve for 960kHz rate](NOTES-logratio-960kHz.md)
+![logratio curve for 960kHz rate](NOTES-logratio-960kHz.png)
 
 Here are the results for 240kHz Sample rate:
 
-![compensation curve for 240kHz rate](NOTES-compensation-240kHz.md)
+![compensation curve for 240kHz rate](NOTES-compensation-240kHz.png)
 
-![logratio curve for 240kHz rate](NOTES-logratio-240kHz.md)
+![logratio curve for 240kHz rate](NOTES-logratio-240kHz.png)
 
 ## References
 
