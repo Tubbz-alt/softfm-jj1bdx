@@ -16,7 +16,8 @@
 * Set default sample rate to 960kHz (use `-L` to set to 240kHz), `-s` option removed
 * Remove 19kHz pilot signal when the stereo PLL is locked
 * Add option `-U` to set deemphasis timing to 75 microseconds for North America (default: 50 microseconds for Europe/Japan)
-* Add experimental equalizer to compensate 0th-hold aperture effect of phase discriminator output (currently with fixed parameter for 240kHz/960kHz sampling rates)
+* Add equalizer to compensate 0th-hold aperture effect of phase discriminator output (with fixed parameter for 240kHz/960kHz sampling rates)
+* Increase the number of FineTuner table size from 64 to 256
 
 ### Usage example
 
