@@ -380,8 +380,12 @@ void FmDecoder::demod_stereo(const SampleVector &samples_baseband,
                              SampleVector &samples_rawstereo) {
   // Multiply the baseband signal with the double-frequency pilot
   // and multiply by 2.00 to get the full amplitude.
-  // TODO: F4EXB claims the multiplication constant
+  // Note: F4EXB claims the multiplication constant
   //       should be 1.17 instead of 2.00
+  //       based on the experience
+  // (See
+  //  https://github.com/f4exb/ngsoftfm/issues/3#issuecomment-453958956
+  //  for the details)
 
   unsigned int n = samples_baseband.size();
   assert(n == samples_rawstereo.size());
