@@ -36,7 +36,7 @@
 
 * Mac mini 2018 3.2GHz Intel Core i7 / macOS 10.14.2 (CPU time: ~9%)
 * Intel NUC DN2820FYKH Celeron N2830 / Ubuntu 18.04 (CPU time: ~45%)
-* Intel NUC DC53427HYE i5-3427U / FreeBSD 11.2-STABLE
+* Intel NUC DC53427HYE i5-3427U / FreeBSD 12.0-STABLE (CPU time: ~12%, when clock ~= 2.3GHz)
 * Raspberry Pi 2 Model B Rev 1.2 / Raspbian (240k samples/sec only)
 
 ### Audio devices
