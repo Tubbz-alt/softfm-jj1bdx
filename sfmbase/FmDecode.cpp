@@ -49,15 +49,13 @@ void PhaseDiscriminator::process(const IQSampleVector &samples_in,
 
 // Construct equalizer for phase discriminator.
 // TODO: value optimized for 960kHz sampling rate
-DiscriminatorEqualizer::DiscriminatorEqualizer(
-        double ifeq_static_gain, double ifeq_fit_factor)
+DiscriminatorEqualizer::DiscriminatorEqualizer(double ifeq_static_gain,
+                                               double ifeq_fit_factor)
     : m_static_gain(ifeq_static_gain), m_fit_factor(ifeq_fit_factor),
-      m_last1_sample(0.0)
-{
-}
+      m_last1_sample(0.0) {}
 
 void DiscriminatorEqualizer::process(const SampleVector &samples_in,
-                                 SampleVector &samples_out) {
+                                     SampleVector &samples_out) {
   unsigned int n = samples_in.size();
   Sample s0 = m_last1_sample;
   samples_out.resize(n);
@@ -235,9 +233,8 @@ void PilotPhaseLock::process(SampleVector &samples_in,
 
 // class FmDecoder
 
-FmDecoder::FmDecoder(double sample_rate_if,
-                     double ifeq_static_gain, double ifeq_fit_factor,
-                     double tuning_offset,
+FmDecoder::FmDecoder(double sample_rate_if, double ifeq_static_gain,
+                     double ifeq_fit_factor, double tuning_offset,
                      double sample_rate_pcm, double deemphasis,
                      double bandwidth_if, double freq_dev, double bandwidth_pcm,
                      unsigned int downsample, bool pilot_shift)
@@ -246,7 +243,8 @@ FmDecoder::FmDecoder(double sample_rate_if,
     : m_sample_rate_if(sample_rate_if),
       m_sample_rate_baseband(sample_rate_if / downsample),
       m_tuning_table_size(finetuner_table_size),
-      m_tuning_shift(lrint(-double(finetuner_table_size) * tuning_offset / sample_rate_if)),
+      m_tuning_shift(lrint(-double(finetuner_table_size) * tuning_offset /
+                           sample_rate_if)),
       m_freq_dev(freq_dev), m_downsample(downsample),
       m_pilot_shift(pilot_shift), m_stereo_detected(false), m_if_level(0),
       m_baseband_mean(0), m_baseband_level(0)

@@ -190,14 +190,13 @@ int main(int argc, char **argv) {
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
   const struct option longopts[] = {
-      {"freq", 1, NULL, 'f'},       {"dev", 1, NULL, 'd'},
-      {"gain", 1, NULL, 'g'},
-      {"pcmrate", 1, NULL, 'r'},    {"agc", 0, NULL, 'a'},
-      {"raw", 1, NULL, 'R'},        {"wav", 1, NULL, 'W'},
-      {"play", 2, NULL, 'P'},       {"pps", 1, NULL, 'T'},
-      {"buffer", 1, NULL, 'b'},     {"quiet", 1, NULL, 'q'},
-      {"pilotshift", 0, NULL, 'X'}, {"usa", 0, NULL, 'U'},
-      {"lowif", 0, NULL, 'L'},
+      {"freq", 1, NULL, 'f'},  {"dev", 1, NULL, 'd'},
+      {"gain", 1, NULL, 'g'},  {"pcmrate", 1, NULL, 'r'},
+      {"agc", 0, NULL, 'a'},   {"raw", 1, NULL, 'R'},
+      {"wav", 1, NULL, 'W'},   {"play", 2, NULL, 'P'},
+      {"pps", 1, NULL, 'T'},   {"buffer", 1, NULL, 'b'},
+      {"quiet", 1, NULL, 'q'}, {"pilotshift", 0, NULL, 'X'},
+      {"usa", 0, NULL, 'U'},   {"lowif", 0, NULL, 'L'},
       {NULL, 0, NULL, 0}};
 
   int c, longindex;
@@ -303,13 +302,13 @@ int main(int argc, char **argv) {
   }
 
   if (low_iffreq) {
-      ifrate = 240000;
-      ifeq_static_gain = 1.47112063;
-      ifeq_fit_factor = 0.48567701;
+    ifrate = 240000;
+    ifeq_static_gain = 1.47112063;
+    ifeq_fit_factor = 0.48567701;
   } else {
-      ifrate = 960000;
-      ifeq_static_gain = 1.3412962;
-      ifeq_fit_factor = 0.34135089;
+    ifrate = 960000;
+    ifeq_static_gain = 1.3412962;
+    ifeq_fit_factor = 0.34135089;
   }
 
   // Catch Ctrl-C and SIGTERM
@@ -516,8 +515,10 @@ int main(int argc, char **argv) {
     // Set nominal audio volume.
     adjust_gain(audiosamples, 0.5);
 
-    // The minus factor is to show the ppm correction to make and not the one made
-    ppm_average.feed(((fm.get_tuning_offset() + delta_if) / tuner_freq) * -1.0e6);
+    // The minus factor is to show the ppm correction to make and not the one
+    // made
+    ppm_average.feed(((fm.get_tuning_offset() + delta_if) / tuner_freq) *
+                     -1.0e6);
 
     // Write PPS markers.
     if (ppsfile != NULL) {
@@ -557,10 +558,10 @@ int main(int argc, char **argv) {
       }
 
       fprintf(stderr,
-              "\rblk=%6d:f=%8.4fMHz:ppm=%+6.2f:IF=%+6.2fdBpp:DU=%6.2fdB:BB=%+5.1fdB",
+              "\rblk=%6d:f=%8.4fMHz:ppm=%+6.2f:IF=%+6.2fdBpp:"
+              "DU=%6.2fdB:BB=%+5.1fdB",
               block, (tuner_freq + fm.get_tuning_offset()) * 1.0e-6,
-              ppm_average.average(),
-              20 * log10(if_level), 20 * log10(du_ratio),
+              ppm_average.average(), 20 * log10(if_level), 20 * log10(du_ratio),
               20 * log10(fm.get_baseband_level()) + 3.01);
       if (outputbuf_samples > 0) {
         const unsigned int nchannel = 2;

@@ -39,7 +39,6 @@ private:
   double m_static_gain;
   double m_fit_factor;
   double m_last1_sample;
-
 };
 
 // Phase-locked loop for stereo pilot.
@@ -132,10 +131,9 @@ public:
   // pilot_shift      :: True to shift pilot signal phase
   //                  :: (use cos(2*x) instead of sin (2*x))
   //                  :: (for multipath distortion detection)
-  FmDecoder(double sample_rate_if,
-            double ifeq_static_gain, double ifeq_fit_factor,
-            double tuning_offset, double sample_rate_pcm,
-            double deemphasis = default_deemphasis_eu,
+  FmDecoder(double sample_rate_if, double ifeq_static_gain,
+            double ifeq_fit_factor, double tuning_offset,
+            double sample_rate_pcm, double deemphasis = default_deemphasis_eu,
             double bandwidth_if = default_bandwidth_if,
             double freq_dev = default_freq_dev,
             double bandwidth_pcm = default_bandwidth_pcm,
