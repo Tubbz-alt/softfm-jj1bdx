@@ -150,8 +150,8 @@ void LowPassFilterFirIQ::process(const IQSampleVector &samples_in,
 DownsampleFilter::DownsampleFilter(unsigned int filter_order, double cutoff,
                                    double downsample, bool integer_factor)
     : m_downsample(downsample),
-      m_downsample_int(integer_factor ? lrint(downsample) : 0), m_pos_frac(0),
-      m_state(filter_order) {
+      m_downsample_int(integer_factor ? lrint(downsample) : 0), m_pos_int(0),
+      m_pos_frac(0), m_state(filter_order) {
   assert(downsample >= 1);
   assert(filter_order > 1);
 
