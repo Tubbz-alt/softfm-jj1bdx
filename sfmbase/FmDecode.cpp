@@ -361,7 +361,7 @@ void FmDecoder::process(const IQSampleVector &samples_in, SampleVector &audio) {
       stereo_to_left_right(m_buf_mono, m_buf_stereo, audio);
     }
     // Stereo deemphasis to L and R
-    m_deemph_stereo.process_inplace(audio);
+    m_deemph_stereo.process_interleaved_inplace(audio);
   } else {
     if (m_pilot_shift) {
       // Fill zero output in left/right channels.
