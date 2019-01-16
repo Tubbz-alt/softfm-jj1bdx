@@ -4,9 +4,11 @@
 
 *The development of this software is terminated.*
 
-* Version 0.2.1, 13-JAN-2019
+* Version 0.2.3, 16-JAN-2019: this is the final release
 * This repository is forked from [SoftFM](https://github.com/jorisvr/SoftFM)
 * SoftFM is an SDR of FM radio for RTL-SDR
+
+* *Note: pre-0.2.3 code has a bug of not doing stereo interleave deemphasis; use this version if you want to stick to the traditional softfm.*
 
 ## Modification of this fork from the original SoftFM
 
