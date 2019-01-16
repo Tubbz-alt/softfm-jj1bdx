@@ -185,7 +185,7 @@ int main(int argc, char **argv) {
   double ifeq_static_gain = 1.0;
   double ifeq_fit_factor = 0.0;
 
-  fprintf(stderr, "softfm-jj1bdx Version 0.2.2-dev\n");
+  fprintf(stderr, "softfm-jj1bdx Version 0.2.3, final\n");
   fprintf(stderr,
           "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
 
